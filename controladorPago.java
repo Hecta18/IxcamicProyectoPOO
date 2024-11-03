@@ -4,26 +4,26 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import main.java.com.easyrents.enumMetodoPago;
-import main.java.com.easyrents.vistaFacturacion;
+//import main.java.com.easyrents.vistaFacturacion;
 
 public class controladorPago {
     private Pago pay;
     private vistaFacturacion vistaPay;
     private List<Reserva> listaReserva; // Lista cargada desde archivo CSV
-    private controladorFacturacion controladorFactura;
+    //private controladorFacturacion controladorFactura;
     private Set<enumMetodoPago> metodosPagoValidos = EnumSet.allOf(enumMetodoPago.class);
 
     // Constructor
-    public controladorPago(Pago pay, vistaFacturacion vistaPay, controladorFacturacion controladorFactura) {
+    public controladorPago(Pago pay, vistaFacturacion vistaPay) {
         this.pay = pay;
         this.vistaPay = vistaPay;
-        this.controladorFactura = controladorFactura;
+        //this.controladorFactura = controladorFactura;
         this.listaReserva = cargarReservasDesdeCSV("reservas.csv"); // Cargar reservas desde CSV
     }
 
@@ -31,15 +31,15 @@ public class controladorPago {
     private List<Reserva> cargarReservasDesdeCSV(String filePath) {
         List<Reserva> reservas = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String linea;
+            //String linea;
             while ((linea = br.readLine()) != null) {
-                String[] valores = linea.split(",");
+                //String[] valores = linea.split(",");
                 // Asumimos que el CSV tiene las columnas: id, monto, otros valores...
-                int id = Integer.parseInt(valores[0]);
-                double monto = Double.parseDouble(valores[1]);
+                //int id = Integer.parseInt(valores[0]);
+                //double monto = Double.parseDouble(valores[1]);
                 // Crear objeto Reserva y agregar a la lista
-                Reserva reserva = new Reserva(id, monto);
-                reservas.add(reserva);
+                //Reserva reserva = new Reserva(id, monto);
+                //reservas.add(reserva);
             }
         } catch (IOException e) {
             vistaPay.mostrarError("Error al cargar reservas desde el archivo CSV: " + e.getMessage());
@@ -75,7 +75,7 @@ public class controladorPago {
                     // Mostrar éxito en la vista
                     vistaPay.mostrarMensaje("Pago procesado exitosamente para la reserva ID: " + reservaId);
                     // Generar factura automáticamente tras el pago
-                    controladorFactura.generarFactura(pay);
+                    //controladorFactura.generarFactura(pay);
                     return;
                 }
             }
