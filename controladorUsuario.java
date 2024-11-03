@@ -1,62 +1,92 @@
 package com.easyrents;
 
-public class controladorUsuario {
-    // Usuario actualmente autenticado en el sistema
-    
-    // Vista relacionada con el inicio de sesión (interfaz gráfica o de consola)
-    private vistaInicioSesion vistaInicioSesion;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-    // Constructor del controlador que inicializa la vista del inicio de sesión
+public class controladorUsuario {
+    private vistaInicioSesion vistaInicioSesion; // Vista para el inicio de sesión
+    private List<Usuario> listaUsuarios; // Lista de usuarios cargada desde el archivo CSV
+    private Usuario usuarioActual; // Usuario actualmente autenticado
+
+    // Constructor que inicializa la vista y carga usuarios desde el archivo CSV
     public controladorUsuario(vistaInicioSesion vistaInicioSesion) {
         this.vistaInicioSesion = vistaInicioSesion;
+        this.listaUsuarios = cargarUsuariosDesdeCSV("usuarios.csv"); // Cargar usuarios desde CSV
+    }
+
+    // Método para cargar usuarios desde un archivo CSV
+    private List<Usuario> cargarUsuariosDesdeCSV(String filePath) {
+        List<Usuario> usuarios = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] valores = linea.split(",");
+                String correo = valores[0];
+                String contraseña = valores[1];
+                Usuario usuario = new Usuario(correo, contraseña); // Crear usuario con datos del CSV
+                usuarios.add(usuario);
+            }
+        } catch (IOException e) {
+            vistaInicioSesion.mostrarError("Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
+        }
+        return usuarios;
+    }
+
+    // Método para guardar un nuevo usuario en el archivo CSV
+    private void guardarUsuarioEnCSV(Usuario usuario, String filePath) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) {
+            bw.write(usuario.toCSV()); // Asume que Usuario tiene un método `toCSV` para formateo
+            bw.newLine();
+        } catch (IOException e) {
+            vistaInicioSesion.mostrarError("Error al guardar usuario en el archivo CSV: " + e.getMessage());
+        }
     }
 
     // Método para gestionar el inicio de sesión de un usuario
     public void iniciarSesion(String correo, String contraseña) {
-        // Validar que el correo y la contraseña no sean nulos ni estén vacíos
         if (correo == null || contraseña == null || correo.isEmpty() || contraseña.isEmpty()) {
             vistaInicioSesion.mostrarError("El correo y la contraseña son obligatorios.");
             return;
         }
 
-        // Simulación de búsqueda del usuario en la base de datos por su correo
-        Usuario usuario = obtenerUsuarioPorCorreo(correo);
-        
-        // Verificar si el usuario existe y si la contraseña es correcta
+        Usuario usuario = obtenerUsuarioPorCorreo(correo); // Buscar usuario en la lista
         if (usuario != null && usuario.getContraseña().equals(contraseña)) {
-            // Autenticar al usuario, guardándolo como el usuario actual
-            usuarioActual = usuario;
-            vistaInicioSesion.mostrarExito("Inicio de sesión exitoso."); // Asegúrate de que este método esté definido
+            usuarioActual = usuario; // Autenticar al usuario
+            vistaInicioSesion.mostrarExito("Inicio de sesión exitoso.");
         } else {
-            // Mostrar error si el correo o la contraseña son incorrectos
             vistaInicioSesion.mostrarError("Correo o contraseña incorrectos.");
         }
     }
 
     // Método para registrar un nuevo usuario en el sistema
     public void registrarUsuario(Usuario nuevoUsuario) {
-        // Validar que los datos del nuevo usuario no sean nulos o estén vacíos
         if (nuevoUsuario == null || nuevoUsuario.getCorreo().isEmpty() || nuevoUsuario.getContraseña().isEmpty()) {
             vistaInicioSesion.mostrarError("Datos inválidos para el registro.");
             return;
         }
 
-        // Verificar si ya existe un usuario con el mismo correo
         Usuario usuarioExistente = obtenerUsuarioPorCorreo(nuevoUsuario.getCorreo());
         if (usuarioExistente == null) {
-            // Si no existe, proceder con el registro del nuevo usuario
-            // Aquí se debe implementar la lógica para guardar el nuevo usuario en la base de datos
+            listaUsuarios.add(nuevoUsuario); // Añadir usuario a la lista
+            guardarUsuarioEnCSV(nuevoUsuario, "usuarios.csv"); // Guardar en CSV
             vistaInicioSesion.mostrarExito("Usuario registrado exitosamente.");
         } else {
-            // Si el usuario ya existe, mostrar un mensaje de error
             vistaInicioSesion.mostrarError("El usuario ya existe.");
         }
     }
 
-    // Simulación de método para buscar un usuario por correo
-    // En una implementación real, aquí se realizaría la consulta a la base de datos
+    // Método para buscar un usuario por correo en la lista cargada desde el CSV
     private Usuario obtenerUsuarioPorCorreo(String correo) {
-        // Placeholder: en una aplicación real, se buscaría el usuario en la base de datos
-        return null; 
+        for (Usuario usuario : listaUsuarios) {
+            if (usuario.getCorreo().equals(correo)) {
+                return usuario;
+            }
+        }
+        return null;
     }
 }
