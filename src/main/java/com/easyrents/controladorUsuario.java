@@ -154,4 +154,53 @@ public class controladorUsuario {
         }
         return null;
     }
+
+    //metodo para actualizar la reserva de un usuario 
+    public void actualizarReservasUsuario(int userID,  ArrayList<Reserva> nuevasReservas){
+        //buscar el usuario dentro de la lista
+        Usuario usuario = null;
+        for (Usuario u : listaUsuarios) {
+            if  (u.getID() == userID) {
+                usuario = u;
+                break;
+            }
+        }
+
+        if (usuario != null) {
+            // Actualizar las reservas del usuario
+            usuario.setReservasAsociadas(nuevasReservas);
+    
+            // Guardar la lista actualizada de usuarios en el archivo CSV
+            guardarListaUsuariosEnCSV();
+            
+            vistaInicioSesion.mostrarExito("Reservas actualizadas exitosamente para el usuario con ID " + userID);
+        } else {
+            vistaInicioSesion.mostrarError("Usuario con ID " + userID + " no encontrado.");
+        }
+    }
+    
+    // Método para guardar toda la lista de usuarios en el archivo CSV
+    private void guardarListaUsuariosEnCSV() {
+        String filePath = "usuarios.csv";
+        
+        try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
+            for (Usuario usuario : listaUsuarios) {
+                // Convierte las reservas en un solo String
+                String reservasString = usuario.getReservasAsociadas()
+                                               .stream()
+                                               .map(Reserva::toString)
+                                               .reduce((res1, res2) -> res1 + ";" + res2)
+                                               .orElse("");
+                
+                String userDataString = usuario.getID() + "," + usuario.getNombre() + "," + usuario.getCorreo() + "," +
+                                        usuario.getContraseña() + "," + usuario.getTipoUsuario() + "," +
+                                        usuario.getNumDocLicencia() + "," + usuario.getNumTelefono() + "," + reservasString;
+                
+                br.write(userDataString);
+                br.newLine();
+            }
+        } catch (IOException e) {
+            vistaInicioSesion.mostrarError("Error al guardar la lista de usuarios en el archivo CSV: " + e.getMessage());
+        }
+    }
 }
