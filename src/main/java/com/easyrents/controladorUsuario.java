@@ -1,5 +1,6 @@
 package main.java.com.easyrents;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,12 +15,6 @@ import java.util.List;
 public class controladorUsuario {
     private vistaInicioSesion vistaInicioSesion; // Vista para el inicio de sesión
     private List<Usuario> listaUsuarios; // Lista de usuarios cargada desde el archivo CSV
-    
-        // Constructor que inicializa la vista y carga usuarios desde el archivo CSV
-        public controladorUsuario(vistaInicioSesion vistaInicioSesion) {
-            this.vistaInicioSesion = vistaInicioSesion;
-            this.listaUsuarios = cargarUsuariosDesdeCSV(); // Cargar usuarios desde CSV
-        }
     
         // Método para cargar usuarios desde un archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
@@ -64,7 +59,7 @@ public class controladorUsuario {
                     usuarios.add(usuario);
                 }
             } catch (IOException e) {
-                vistaInicioSesion.mostrarError("Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
+                JOptionPane.showMessageDialog(null,"Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
             }
             return usuarios;
         }
@@ -175,9 +170,9 @@ public class controladorUsuario {
             // Guardar la lista actualizada de usuarios en el archivo CSV
             guardarUsuarioEnCSV(usuario);
             
-            vistaInicioSesion.mostrarExito("Reservas actualizadas exitosamente para el usuario con ID " + userID);
+            JOptionPane.showMessageDialog(null,"Reservas actualizadas exitosamente para el usuario con ID " + userID);
         } else {
-            vistaInicioSesion.mostrarError("Usuario con ID " + userID + " no encontrado.");
+            JOptionPane.showMessageDialog(null,"Usuario con ID " + userID + " no encontrado.");
         }
     }
 }

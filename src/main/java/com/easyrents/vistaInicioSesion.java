@@ -383,20 +383,6 @@ public class vistaInicioSesion {
 		tipoUsuarioDropDown.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
         tipoUsuarioDropDown.setBackground(Color.WHITE);
 		tipoUsuarioDropDown.setBounds(170, 428, 164, 29);
-        tipoUsuarioDropDown.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                if(tipoUsuarioDropDown.getSelectedItem().toString() == "Otro (Especifique)"){
-                    razonExtra.setVisible(true);
-                    razonExtraLbl.setVisible(true);
-                    crearCuentaBtn.setLocation(91, 470);
-                    
-                }else{
-                    razonExtra.setVisible(false);
-                    razonExtraLbl.setVisible(false);
-                    crearCuentaBtn.setLocation(91, 435);
-                }
-            }
-        });
 		frame.getContentPane().add(tipoUsuarioDropDown);
 
 		crearCuentaBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 22));
@@ -405,7 +391,7 @@ public class vistaInicioSesion {
 		int randomID = new Random().nextInt(999999998) + 1;
         crearCuentaBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
-                ArrayList<String> values = new ArrayList<>();//posible unchecked
+                ArrayList<String> values = new ArrayList<>();
                 values.add(nombreEntry.getText());
                 values.add(correoEntry.getText());
                 values.add(new String(passwordField.getPassword()));
@@ -447,6 +433,7 @@ public class vistaInicioSesion {
 					userControl.guardarUsuarioEnCSV(nuevoUsuario);
                     return;
                 }else{
+					mostrarExito("Se ha creado su cuenta exitosamente!");
                     Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), razonExtra.getText(), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
 					userList.add(nuevoUsuario);
 					userControl.guardarUsuarioEnCSV(nuevoUsuario);
@@ -596,7 +583,7 @@ public class vistaInicioSesion {
 
         JLabel licenciasListLabel = new JLabel(String.valueOf(currentUsuario.getNumDocLicencia()));
 		licenciasListLabel.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 16));
-		licenciasListLabel.setBounds(46, 380, 139, 23);
+		licenciasListLabel.setBounds(158, 372, 139, 21);
 		frame.getContentPane().add(licenciasListLabel);
 		
 		JLabel licenciaLbl = new JLabel("Licencias Asociadas:");
@@ -609,13 +596,13 @@ public class vistaInicioSesion {
 		telefonoTxtLabel.setBounds(10, 240, 71, 31);
 		frame.getContentPane().add(telefonoTxtLabel);
 
-        JLabel telefonoValueLbl = new JLabel(String.valueOf(currentUsuario.getNumTelefono())); // FALTA COLOCAR .getTelefono() COMO MÉTODO DE USUARIO
+        JLabel telefonoValueLbl = new JLabel(String.valueOf(currentUsuario.getNumTelefono()));
 		telefonoValueLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 17));
 		telefonoValueLbl.setBounds(91, 240, 150, 31);
 		frame.getContentPane().add(telefonoValueLbl);
 		frame.setLocationRelativeTo(null);
 		
-		JLabel dpiTextLbl = new JLabel("No. de DPI asociado:");
+		JLabel dpiTextLbl = new JLabel("No. de ID asociado:");
 		dpiTextLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 17));
 		dpiTextLbl.setBounds(10, 282, 159, 31);
 		frame.getContentPane().add(dpiTextLbl);
