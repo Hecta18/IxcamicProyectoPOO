@@ -2,6 +2,7 @@ package main.java.com.easyrents;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class controladorUsuario {
@@ -30,7 +31,12 @@ public class controladorUsuario {
                     String tipoUsuario = valores[4];
                     long numDocLicencia = Long.parseLong(valores[5]);
                     int numTelefono = Integer.parseInt(valores[6]);
-                    Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono); // Crear usuario con datos del CSV
+                    
+                    //crear lista de reservas desde el último campo
+                    List<String> reservas = Arrays.asList(valores[7].split(";"));
+
+                    //crear usuario con datos del csv
+                    Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, null);
                     usuarios.add(usuario);
                 }
             } catch (IOException e) {
@@ -44,28 +50,38 @@ public class controladorUsuario {
         // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
         private void guardarUsuarioEnCSV(Usuario usuario, String filePath) {
             File file = new File(filePath);
-            String userDataString = usuario.getID() + "," + usuario.getNombre() + "," + usuario.getCorreo() + "," + usuario.getContraseña() + "," + usuario.getTipoUsuario() + "," + usuario.getNumDocLicencia() + "," + usuario.getNumTelefono();
-            if(file.exists()){
-                String line;
+            //convierte las reservaciones en un solo String
+            String reservasString = usuario.getReservasAsociadas()
+                                            .stream()
+                                            .map(Reserva::toString)
+                                            .reduce((res1, res2) -> res1 + "," + res2)
+                                            .orElse("");
+
+            String userDataString = usuario.getID() + "," + usuario.getNombre() + "," + usuario.getCorreo() + "," +
+                                    usuario.getContraseña() + "," + usuario.getTipoUsuario() + "," + 
+                                    usuario.getNumDocLicencia() + "," + usuario.getNumTelefono() + "," + reservasString;
+        
+            if(file.exists()) {
                 ArrayList<String> data = new ArrayList<>();
-                try(BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-                    while((line = br.readLine()) != null) {
+                try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
                         data.add(line);
                     }
-                }catch (IOException e) {
+                } catch (IOException e) {
                     System.out.println("Error al abrir el archivo, revise el nombre ingresado.");
                 }
                 data.add(userDataString);
-                try(BufferedWriter br = new BufferedWriter(new FileWriter(filePath))){
-                    for(String u : data){
+                try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
+                    for (String u : data) {
                         br.write(u);
                         br.newLine();
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }else{
-                try(BufferedWriter br = new BufferedWriter(new FileWriter(filePath))){
+            } else {
+                try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
                     br.write(userDataString);
                     br.newLine();
                 } catch (IOException e) {
