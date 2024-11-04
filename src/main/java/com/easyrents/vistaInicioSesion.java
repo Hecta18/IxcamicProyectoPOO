@@ -117,6 +117,10 @@ public class vistaInicioSesion {
 					mostrarError("Debe de ingresar una dirección de correo válida");
 					return;
 				} else {
+					if (userList.isEmpty()){
+						mostrarError("No existe ningún usuario registrado actualmente");
+						return;
+					}
 					for(Usuario u : userList){
 						if(u.getCorreo().equals(correoIngresado) && new String(passwordField.getPassword()).equals(u.getContraseña())){
 							redireccionarDashboard(frame, u, userList, vehicleList, userControl, vehicleControl);

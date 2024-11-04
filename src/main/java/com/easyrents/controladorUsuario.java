@@ -1,6 +1,5 @@
 package main.java.com.easyrents;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,12 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import javax.swing.JOptionPane;
 
 public class controladorUsuario {
     private vistaInicioSesion vistaInicioSesion; // Vista para el inicio de sesión
-    private List<Usuario> listaUsuarios; // Lista de usuarios cargada desde el archivo CSV
+    private ArrayList<Usuario> listaUsuarios; // Lista de usuarios cargada desde el archivo CSV
     
         // Método para cargar usuarios desde un archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
@@ -28,8 +27,7 @@ public class controladorUsuario {
                 try (BufferedReader br = new BufferedReader(new FileReader("usuarios.csv"))) {
                     String linea;
                     while ((linea = br.readLine()) != null) {
-                        String[] valores = linea.split(",");
-                        System.out.println(valores.length);
+                        String[] valores = linea.split(",", 8);
                         int ID = Integer.parseInt(valores[0]);
                         String nombre = valores[1];
                         String correo = valores[2];
@@ -37,34 +35,40 @@ public class controladorUsuario {
                         String tipoUsuario = valores[4];
                         long numDocLicencia = Long.parseLong(valores[5]);
                         int numTelefono = Integer.parseInt(valores[6]);
-                        String reservasArray = valores[7];
+                        String reservasArray = valores[7].substring(1, valores[7].length() - 1); // Quitar los {} de reservas
 
-                        //crear lista de reservas desde el último campo
-                        List<String> reservasStrings = Arrays.asList(reservasArray.split(","));
                         ArrayList<Reserva> reservas = new ArrayList<>();
-
-                        // Convertir cada string de reserva en un objeto Reserva y añadirlo a la lista
-                        for (String s : reservasStrings){
-                            String[] reservaData = s.split(",");
-
-                            //extraer y convertir los datos de la reserva
+                        String[] reservasStrings = reservasArray.split("},\\{");
+                        
+                        for (String reservaStr : reservasStrings) {
+                            String[] reservaData = reservaStr.split(",", 6);
                             int reservaID = Integer.parseInt(reservaData[0]);
-                            String destino = reservaData[1]; // FALTA CAMBIAR ESTO PARA QUE SEA TODA LA INFO DEL VEHÍCULO EN CUESTIÓN
-                            Vehiculo vehiculoPlaceHolder = new Vehiculo(0, null, null, 0, null, 0, false); // QUITAR ESTOOO
+                            
+                            // Datos del vehículo
+                            String[] vehiculoData = reservaData[1].substring(1, reservaData[1].length() - 1).split(",");
+                            int vehiculoID = Integer.parseInt(vehiculoData[0]);
+                            String marca = vehiculoData[1];
+                            String modelo = vehiculoData[2];
+                            int año = Integer.parseInt(vehiculoData[3]);
+                            String tipo = vehiculoData[4];
+                            double tarifaDiaria = Double.parseDouble(vehiculoData[5]);
+                            boolean disponible = Boolean.parseBoolean(vehiculoData[6]);
+
+                            // Instanciar el vehículo y la reserva
+                            Vehiculo vehiculo = new Vehiculo(vehiculoID, marca, modelo, año, tipo, tarifaDiaria, disponible);
                             LocalDate fechaInicio = LocalDate.parse(reservaData[2]);
                             LocalDate fechaFin = LocalDate.parse(reservaData[3]);
                             double monto = Double.parseDouble(reservaData[4]);
+                            String estado = reservaData[5];
 
-                            //crear el objeto reserva con los datos
-                            Reserva reserva = new Reserva(ID, vehiculoPlaceHolder, fechaInicio, fechaFin, monto);
+                            Reserva reserva = new Reserva(reservaID, vehiculo, fechaInicio, fechaFin, monto);
                             reservas.add(reserva);
                         }
 
-                        //crear el objeto usuario con los datos csv
                         Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservas);
                         usuarios.add(usuario);
-                    }
-                } catch (IOException e) {
+                        }
+                    }catch (IOException e) {
                     JOptionPane.showMessageDialog(null,"Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
                 }
                 return usuarios;
@@ -76,47 +80,47 @@ public class controladorUsuario {
         // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
         public void guardarUsuarioEnCSV(Usuario usuario) {
             String filePath = "usuarios.csv";
-            File file = new File(filePath);
-            //convierte las reservaciones en un solo String
-            String reservasString = usuario.getReservasAsociadas()
-                                            .stream()
-                                            .map(Reserva::toString)
-                                            .reduce((res1, res2) -> res1 + "," + res2)
-                                            .orElse("");
+            // Convertir reservas y vehículos asociados en un solo string
+            String reservasString = usuario.getReservasAsociadas().stream()
+                .map(reserva -> {
+                    Vehiculo vehiculo = reserva.getVehiculo();
+                    // Cambiar de una vez a los tipos de datos que se necesiten:
+                    return String.format("{%d,{%d,%s,%s,%d,%s,%.2f,%b},%s,%s,%.2f,%s}",
+                        reserva.getId(),
+                        vehiculo.getID(),
+                        vehiculo.getMarca(),
+                        vehiculo.getModelo(),
+                        vehiculo.getAño(),
+                        vehiculo.getTipo(),
+                        vehiculo.getTarifaDiaria(),
+                        vehiculo.getDisponible(),
+                        reserva.getFechaInicio(),
+                        reserva.getFechaFin(),
+                        reserva.getMonto(),
+                        reserva.getEstado()
+                    );
+                }).reduce((res1, res2) -> res1 + "," + res2).orElse("");
 
-            String userDataString = usuario.getID() + "," + usuario.getNombre() + "," + usuario.getCorreo() + "," +
-                                    usuario.getContraseña() + "," + usuario.getTipoUsuario() + "," + 
-                                    usuario.getNumDocLicencia() + "," + usuario.getNumTelefono() + "," + reservasString;
-        
-            if(file.exists()) {
-                ArrayList<String> data = new ArrayList<>();
-                try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        data.add(line);
-                    }
-                } catch (IOException e) {
-                    System.out.println("Error al abrir el archivo, revise el nombre ingresado.");
-                }
-                data.add(userDataString);
-                try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
-                    for (String u : data) {
-                        br.write(u);
-                        br.newLine();
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
-                    br.write(userDataString);
-                    br.newLine();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            // Convertir el usuario en un string siguiendo el formato especificado
+            String userDataString = String.format("%d,%s,%s,%s,%s,%d,%d,{%s}",
+                usuario.getID(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getContraseña(),
+                usuario.getTipoUsuario(),
+                usuario.getNumDocLicencia(),
+                usuario.getNumTelefono(),
+                reservasString
+            );
+            System.out.println(usuario.getTipoUsuario());
+
+            try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath, true))) {
+                br.write(userDataString);
+                br.newLine();
+            } catch (IOException e) {
+                throw new RuntimeException("Error al guardar el usuario en el archivo CSV: " + e.getMessage());
             }
         }
-    
         // Método para gestionar el inicio de sesión de un usuario
         public void iniciarSesion(String correo, String contraseña) {
             if (correo == null || contraseña == null || correo.isEmpty() || contraseña.isEmpty()) {
@@ -164,22 +168,66 @@ public class controladorUsuario {
         //buscar el usuario dentro de la lista
         Usuario usuario = null;
         for (Usuario u : listaUsuarios) {
-            if  (u.getID() == userID) {
+            if (u.getID() == userID) {
                 usuario = u;
                 break;
             }
         }
-
+    
         if (usuario != null) {
-            // Actualizar las reservas del usuario
+            // Actualizar las reservas del usuario encontrado
             usuario.setReservasAsociadas(nuevasReservas);
     
-            // Guardar la lista actualizada de usuarios en el archivo CSV
-            guardarUsuarioEnCSV(usuario);
+            // Guardar la lista completa de usuarios en el archivo CSV
+            guardarListaUsuariosEnCSV(listaUsuarios);
             
-            JOptionPane.showMessageDialog(null,"Reservas actualizadas exitosamente para el usuario con ID " + userID);
+            JOptionPane.showMessageDialog(null, "Reservas actualizadas exitosamente para el usuario con ID " + userID);
         } else {
-            JOptionPane.showMessageDialog(null,"Usuario con ID " + userID + " no encontrado.");
+            JOptionPane.showMessageDialog(null, "Usuario con ID " + userID + " no encontrado.");
+        }
+    }
+
+    public void guardarListaUsuariosEnCSV(ArrayList<Usuario> usuarios) {
+        String filePath = "usuarios.csv";
+        try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
+            for (Usuario usuario : usuarios) {
+                // Convertir las reservas y vehículos del usuario en un solo string
+                String reservasString = usuario.getReservasAsociadas().stream()
+                    .map(reserva -> {
+                        Vehiculo vehiculo = reserva.getVehiculo();
+                        return String.format("{%d,{%d,%s,%s,%d,%s,%.2f,%b},%s,%s,%.2f,%s}",
+                            reserva.getId(),
+                            vehiculo.getID(),
+                            vehiculo.getMarca(),
+                            vehiculo.getModelo(),
+                            vehiculo.getAño(),
+                            vehiculo.getTipo(),
+                            vehiculo.getTarifaDiaria(),
+                            vehiculo.getDisponible(),
+                            reserva.getFechaInicio(),
+                            reserva.getFechaFin(),
+                            reserva.getMonto(),
+                            reserva.getEstado()
+                        );
+                    }).reduce((res1, res2) -> res1 + "," + res2).orElse("");
+    
+                // Convertir los datos del usuario en un string conforme al formato
+                String userDataString = String.format("%d,%s,%s,%s,%s,%d,%d,{%s}",
+                    usuario.getID(),
+                    usuario.getNombre(),
+                    usuario.getCorreo(),
+                    usuario.getContraseña(),
+                    usuario.getTipoUsuario(),
+                    usuario.getNumDocLicencia(),
+                    usuario.getNumTelefono(),
+                    reservasString
+                );
+    
+                br.write(userDataString);
+                br.newLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar la lista de usuarios en el archivo CSV: " + e.getMessage());
         }
     }
 }
