@@ -1,6 +1,11 @@
 package main.java.com.easyrents;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,15 +17,15 @@ public class controladorUsuario {
         // Constructor que inicializa la vista y carga usuarios desde el archivo CSV
         public controladorUsuario(vistaInicioSesion vistaInicioSesion) {
             this.vistaInicioSesion = vistaInicioSesion;
-            this.listaUsuarios = cargarUsuariosDesdeCSV("usuarios.csv"); // Cargar usuarios desde CSV
+            this.listaUsuarios = cargarUsuariosDesdeCSV(); // Cargar usuarios desde CSV
         }
     
         // Método para cargar usuarios desde un archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
         // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
-        public ArrayList<Usuario> cargarUsuariosDesdeCSV(String filePath) {
+        public ArrayList<Usuario> cargarUsuariosDesdeCSV() {
             ArrayList<Usuario> usuarios = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("usuarios.csv"))) {
                 String linea;
                 while ((linea = br.readLine()) != null) {
                     String[] valores = linea.split(",");
@@ -44,8 +49,9 @@ public class controladorUsuario {
                         reservas.add(reserva);
                     }
                     }
-                    //crear usuario con datos del csv
-                    Usuario usuario = new Usuario(0, linea, linea, filePath, linea, 0, 0, null);
+                    String filePath;
+                                        //crear usuario con datos del csv
+                                        Usuario usuario = new Usuario(0, linea, linea, filePath, linea, 0, 0, null);
                     usuarios.add(usuario);
                     
                 }
@@ -58,7 +64,8 @@ public class controladorUsuario {
         // Método para guardar un nuevo usuario en el archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
         // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
-        public void guardarUsuarioEnCSV(Usuario usuario, String filePath) {
+        public void guardarUsuarioEnCSV(Usuario usuario) {
+            String filePath = "usuarios.csv";
             File file = new File(filePath);
             //convierte las reservaciones en un solo String
             String reservasString = usuario.getReservasAsociadas()
@@ -107,7 +114,7 @@ public class controladorUsuario {
                 return;
             }
             // Nombre del archivo default: usuarios.csv
-            ArrayList<Usuario> listaUsuarios = cargarUsuariosDesdeCSV("usuarios.csv");
+            ArrayList<Usuario> listaUsuarios = cargarUsuariosDesdeCSV();
             for (Usuario u : listaUsuarios){
                 if(u.getCorreo().equals(correo) && contraseña.equals(u.getContraseña())){
                     // FALTA
@@ -125,7 +132,7 @@ public class controladorUsuario {
         Usuario usuarioExistente = obtenerUsuarioPorCorreo(nuevoUsuario.getCorreo());
         if (usuarioExistente == null) {
             listaUsuarios.add(nuevoUsuario); // Añadir usuario a la lista
-            guardarUsuarioEnCSV(nuevoUsuario, "usuarios.csv"); // Guardar en CSV
+            guardarUsuarioEnCSV(nuevoUsuario); // Guardar en CSV
             vistaInicioSesion.mostrarExito("Usuario registrado exitosamente.");
         } else {
             vistaInicioSesion.mostrarError("El usuario ya existe.");
