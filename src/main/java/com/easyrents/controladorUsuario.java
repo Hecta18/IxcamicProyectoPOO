@@ -33,11 +33,21 @@ public class controladorUsuario {
                     int numTelefono = Integer.parseInt(valores[6]);
                     
                     //crear lista de reservas desde el último campo
-                    List<String> reservas = Arrays.asList(valores[7].split(";"));
+                    List<String> reservasStrings = Arrays.asList(valores[7].split(";"));
+                    ArrayList<Reserva> reservas = new ArrayList<>();
 
+                    // Convertir cada string de reserva en un objeto Reserva y añadirlo a la lista
+                    for (String s : reservasStrings){
+                        String[] reservaData = s.split(",");
+                        //crear el objeto reserva con los datos
+                        Reserva reserva = new Reserva(ID, null, null, null, null, numTelefono);
+                        reservas.add(reserva);
+                    }
+                    }
                     //crear usuario con datos del csv
-                    Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, null);
+                    Usuario usuario = new Usuario(0, linea, linea, filePath, linea, 0, 0, null);
                     usuarios.add(usuario);
+                    
                 }
             } catch (IOException e) {
                 vistaInicioSesion.mostrarError("Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
