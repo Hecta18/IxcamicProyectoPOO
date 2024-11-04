@@ -644,11 +644,13 @@ public class vistaInicioSesion {
 		reservasPane.setBounds(10, 86, 324, 357);
 		reservasPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		reservasPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		reservasPane.setBackground(Color.WHITE);
 		frame.getContentPane().add(reservasPane);
 		
 		JButton eliminarRsrvBtn = new JButton("Eliminar");
 		eliminarRsrvBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 18));
 		eliminarRsrvBtn.setBounds(115, 470, 117, 38);
+		eliminarRsrvBtn.setBackground(Color.WHITE);
 		eliminarRsrvBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				String seleccionada = listReservas.getSelectedValue().toString();

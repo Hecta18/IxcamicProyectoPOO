@@ -18,50 +18,57 @@ public class controladorUsuario {
     
         // Método para cargar usuarios desde un archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
-        // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
+        // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservasActuales
         public ArrayList<Usuario> cargarUsuariosDesdeCSV() {
             ArrayList<Usuario> usuarios = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader("usuarios.csv"))) {
-                String linea;
-                while ((linea = br.readLine()) != null) {
-                    String[] valores = linea.split(",");
-                    int ID = Integer.parseInt(valores[0]);
-                    String nombre = valores[1];
-                    String correo = valores[2];
-                    String contraseña = valores[3];
-                    String tipoUsuario = valores[4];
-                    long numDocLicencia = Long.parseLong(valores[5]);
-                    int numTelefono = Integer.parseInt(valores[6]);
-                    
-                    //crear lista de reservas desde el último campo
-                    List<String> reservasStrings = Arrays.asList(valores[7].split(";"));
-                    ArrayList<Reserva> reservas = new ArrayList<>();
+            File archivo = new File("usuarios.csv");
+            if (!archivo.exists() || archivo.length() == 0) {
+                return usuarios;
+            }else{
+                try (BufferedReader br = new BufferedReader(new FileReader("usuarios.csv"))) {
+                    String linea;
+                    while ((linea = br.readLine()) != null) {
+                        String[] valores = linea.split(",");
+                        System.out.println(valores.length);
+                        int ID = Integer.parseInt(valores[0]);
+                        String nombre = valores[1];
+                        String correo = valores[2];
+                        String contraseña = valores[3];
+                        String tipoUsuario = valores[4];
+                        long numDocLicencia = Long.parseLong(valores[5]);
+                        int numTelefono = Integer.parseInt(valores[6]);
+                        String reservasArray = valores[7];
 
-                    // Convertir cada string de reserva en un objeto Reserva y añadirlo a la lista
-                    for (String s : reservasStrings){
-                        String[] reservaData = s.split(",");
+                        //crear lista de reservas desde el último campo
+                        List<String> reservasStrings = Arrays.asList(reservasArray.split(","));
+                        ArrayList<Reserva> reservas = new ArrayList<>();
 
-                        //extraer y convertir los datos de la reserva 
-                        int reservaID = Integer.parseInt(reservaData[0]);
-                        String destino = reservaData[1]; // FALTA CAMBIAR ESTO PARA QUE SEA TODA LA INFO DEL VEHÍCULO EN CUESTIÓN
-                        Vehiculo vehiculoPlaceHolder = new Vehiculo(0, null, null, 0, null, 0, false); // QUITAR ESTOOO
-                        LocalDate fechaInicio = LocalDate.parse(reservaData[2]);
-                        LocalDate fechaFin = LocalDate.parse(reservaData[3]);
-                        double monto = Double.parseDouble(reservaData[4]);
+                        // Convertir cada string de reserva en un objeto Reserva y añadirlo a la lista
+                        for (String s : reservasStrings){
+                            String[] reservaData = s.split(",");
 
-                        //crear el objeto reserva con los datos
-                        Reserva reserva = new Reserva(ID, vehiculoPlaceHolder, fechaInicio, fechaFin, monto);
-                        reservas.add(reserva);
+                            //extraer y convertir los datos de la reserva
+                            int reservaID = Integer.parseInt(reservaData[0]);
+                            String destino = reservaData[1]; // FALTA CAMBIAR ESTO PARA QUE SEA TODA LA INFO DEL VEHÍCULO EN CUESTIÓN
+                            Vehiculo vehiculoPlaceHolder = new Vehiculo(0, null, null, 0, null, 0, false); // QUITAR ESTOOO
+                            LocalDate fechaInicio = LocalDate.parse(reservaData[2]);
+                            LocalDate fechaFin = LocalDate.parse(reservaData[3]);
+                            double monto = Double.parseDouble(reservaData[4]);
+
+                            //crear el objeto reserva con los datos
+                            Reserva reserva = new Reserva(ID, vehiculoPlaceHolder, fechaInicio, fechaFin, monto);
+                            reservas.add(reserva);
+                        }
+
+                        //crear el objeto usuario con los datos csv
+                        Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservas);
+                        usuarios.add(usuario);
                     }
-                    
-                    //crear el objeto usuario con los datos csv
-                    Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservas);
-                    usuarios.add(usuario);
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(null,"Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
                 }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null,"Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
+                return usuarios;
             }
-            return usuarios;
         }
     
         // Método para guardar un nuevo usuario en el archivo CSV
