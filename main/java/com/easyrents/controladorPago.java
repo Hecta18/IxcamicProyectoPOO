@@ -9,8 +9,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import main.java.com.easyrents.enumMetodoPago;
-import main.java.com.easyrents.vistaFacturacion;
+//import main.java.com.easyrents.enumMetodoPago;
+//import main.java.com.easyrents.vistaFacturacion;
 
 public class controladorPago {
     private Pago pay;
@@ -38,7 +38,7 @@ public class controladorPago {
                 int id = Integer.parseInt(valores[0]);
                 double monto = Double.parseDouble(valores[1]);
                 // Crear objeto Reserva y agregar a la lista
-                Reserva reserva = new Reserva(id, monto);
+                Reserva reserva = new Reserva(id, null, null, null, null, monto);
                 reservas.add(reserva);
             }
         } catch (IOException e) {

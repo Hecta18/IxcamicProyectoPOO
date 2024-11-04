@@ -1,13 +1,10 @@
 package com.easyrents;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class controladorVehiculo {
     private vistaBusquedaVehiculos vistaBusqueda; // Vista para la búsqueda de vehículos
@@ -33,7 +30,7 @@ public class controladorVehiculo {
                 double tarifaDiaria = Double.parseDouble(valores[4]);
                 
                 // Crear un objeto Vehiculo con los datos del CSV
-                Vehiculo vehiculo = new Vehiculo(id, marca, modelo, tipo, tarifaDiaria);
+                Vehiculo vehiculo = new Vehiculo(id, marca, modelo, id, tipo, tarifaDiaria, false);
                 vehiculos.add(vehiculo);
             }
         } catch (IOException e) {
@@ -64,7 +61,7 @@ public class controladorVehiculo {
     public void resultadosBusqueda(String marca, String modelo, String tipo, int vehiculoId) {
         List<Vehiculo> resultados = buscarVehiculos(marca, modelo, tipo, vehiculoId);
         if (!resultados.isEmpty()) {
-            vistaBusqueda.mostrarResultados(resultados);
+            vistaBusqueda.mostrarResultadosBusqueda(resultados);
         } else {
             vistaBusqueda.mostrarError("No se encontraron vehículos que coincidan con los criterios.");
         }

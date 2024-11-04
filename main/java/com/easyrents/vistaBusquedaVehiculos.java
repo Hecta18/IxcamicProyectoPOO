@@ -1,4 +1,3 @@
-package com.easyrents;
 
 import java.awt.BorderLayout;
 import java.util.List;
