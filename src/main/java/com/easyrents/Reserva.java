@@ -78,8 +78,7 @@ public class Reserva {
     //TOSTRING
     @Override
     public String toString() {
-        return "Reserva [id=" + id + ", vehiculo=" + vehiculo + ", fechaInicio=" + fechaInicio
-                + ", fechaFin=" + fechaFin + ", monto=" + monto + "]";
+        return this.getId() + "," + vehiculo.getID() + "," + vehiculo.getMarca() + "," + vehiculo.getModelo() + "," + vehiculo.getAño() + "," + fechaInicio + "," + fechaFin + "," + monto;
     }
 
 	public char[] toCSV() {

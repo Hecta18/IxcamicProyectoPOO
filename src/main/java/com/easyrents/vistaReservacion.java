@@ -141,10 +141,6 @@ public class vistaReservacion {
 					LocalDate fechaFinalDate = LocalDate.from(fechaFinal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 					
 					double precioPagar = vehiculo.getTarifaDiaria() * numDias;
-					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
-		
-					Reserva reservaNueva = new Reserva(0, currentUsuario, vehiculo, fechaInicioDate, fechaFinalDate, precioPagar);
-					// currentUsuario.getReservas().add(reservaNueva);
 				} catch (NumberFormatException nF) {
 					mostrarError("Debe de llenar todos los campos de fecha solicitados.");
 				}
@@ -190,14 +186,14 @@ public class vistaReservacion {
 					double precioPagar = vehiculo.getTarifaDiaria() * numDias;
 					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
 					// Reserva de prueba
-					Reserva reservaNueva = new Reserva(0, currentUsuario, vehiculo, fechaInicioDate, fechaFinalDate, precioPagar);
+					Reserva reservaNueva = new Reserva(0, vehiculo, fechaInicioDate, fechaFinalDate, precioPagar);
 					currentUsuario.getReservasAsociadas().add(reservaNueva);
 					for (Usuario u : userList) {
 						if (u.getCorreo().equals(currentUsuario.getCorreo())) {
 							u.getReservasAsociadas().add(reservaNueva);
 						}
 					}
-					userControl.guardarUsuarioEnCSV(currentUsuario);
+					userControl.actualizarReservasUsuario(currentUsuario.getID(), currentUsuario.getReservasAsociadas());
 				}catch(NumberFormatException nF){
 					mostrarError("Debe de llenar todos los campos de fecha solicitados.");
 				}

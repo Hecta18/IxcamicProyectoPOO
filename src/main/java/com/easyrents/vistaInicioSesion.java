@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -118,7 +119,7 @@ public class vistaInicioSesion {
 				} else {
 					for(Usuario u : userList){
 						if(u.getCorreo().equals(correoIngresado) && new String(passwordField.getPassword()).equals(u.getContraseña())){
-							redireccionarDashboard(frame, u);
+							redireccionarDashboard(frame, u, userList, vehicleList, userControl, vehicleControl);
 							return;
 						}else{
 							mostrarError("La contraseña o el correo ingresado no son correctos.");
@@ -196,7 +197,7 @@ public class vistaInicioSesion {
 		perfilBtn.setRolloverIcon(new ImageIcon(profileImgHover));
 		perfilBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
-				redireccionarPerfil(frame, usuarioActual);
+				redireccionarPerfil(frame, usuarioActual, userList, vehicleList, userControl, vehicleControl);
 			}
 		});
 		frame.getContentPane().add(perfilBtn);
@@ -211,7 +212,7 @@ public class vistaInicioSesion {
 		verReservasBtn.setRolloverIcon(new ImageIcon(verReservasImgHover));
 		verReservasBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
-				redireccionarReservas(frame, usuarioActual);
+				redireccionarReservas(frame, usuarioActual, userList, vehicleList, userControl, vehicleControl);
 			}
 		});
 		frame.getContentPane().add(verReservasBtn);
@@ -227,7 +228,7 @@ public class vistaInicioSesion {
 		homeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent a){
-				redireccionarDashboard(frame, usuarioActual);
+				redireccionarDashboard(frame, usuarioActual, userList, vehicleList, userControl, vehicleControl);
 			}
 		});
 		frame.getContentPane().add(homeBtn);
@@ -496,15 +497,15 @@ public class vistaInicioSesion {
 			int sizeBuses = datosFiltradosBuses.size();
 			String[] datosFiltradosMotosArray = new String[sizeMotos];
 			for(int i = 0; i < sizeMotos; i++){
-				datosFiltradosMotosArray[i] = datosFiltradosMotos.get(i).getMarca() + " " + datosFiltradosMotos.get(i).getModelo() + " " + datosFiltradosMotos.get(i).getAño() + " ; Q." + datosFiltradosMotos.get(i).getTarifaDiaria() + "/día";
+				datosFiltradosMotosArray[i] = datosFiltradosMotos.get(i).getMarca() + " " + datosFiltradosMotos.get(i).getModelo() + " " + datosFiltradosMotos.get(i).getAño() + " Q." + datosFiltradosMotos.get(i).getTarifaDiaria() + "/día";
 			}
 			String[] datosFiltradosAutosArray = new String[sizeAutos];
 			for(int i = 0; i < sizeAutos; i++){
-				datosFiltradosAutosArray[i] = datosFiltradosAutos.get(i).getMarca() + " " + datosFiltradosAutos.get(i).getModelo() + " " + datosFiltradosAutos.get(i).getAño() + " ; Q." + datosFiltradosAutos.get(i).getTarifaDiaria() + "/día";
+				datosFiltradosAutosArray[i] = datosFiltradosAutos.get(i).getMarca() + " " + datosFiltradosAutos.get(i).getModelo() + " " + datosFiltradosAutos.get(i).getAño() + " Q." + datosFiltradosAutos.get(i).getTarifaDiaria() + "/día";
 			}
 			String[] datosFiltradosBusesArray = new String[sizeBuses];
 			for(int i = 0; i < sizeBuses; i++){
-				datosFiltradosBusesArray[i] = datosFiltradosBuses.get(i).getMarca() + " " + datosFiltradosBuses.get(i).getModelo() + " " + datosFiltradosBuses.get(i).getAño() + " ; Q." + datosFiltradosBuses.get(i).getTarifaDiaria() + "/día";
+				datosFiltradosBusesArray[i] = datosFiltradosBuses.get(i).getMarca() + " " + datosFiltradosBuses.get(i).getModelo() + " " + datosFiltradosBuses.get(i).getAño() + " Q." + datosFiltradosBuses.get(i).getTarifaDiaria() + "/día";
 			}
 			vehiculoDropDown.removeAll();
 			vehiculoDropDown.revalidate();
@@ -554,18 +555,18 @@ public class vistaInicioSesion {
 							tipoAuto = "Bus particular";
 							break;
 					}
-					Vehiculo vehiculoSeleccionado = new Vehiculo(1, datosVehiculo[0], datosVehiculo[1], Integer.parseInt(datosVehiculo[2]), tipoAuto, Double.parseDouble(datosVehiculo[3].replaceAll("Q.", "").replaceAll("/día", "")), true);
+					int randomID = new Random().nextInt(999999998) + 1;
+					Vehiculo vehiculoSeleccionado = new Vehiculo(randomID, datosVehiculo[0], datosVehiculo[1], Integer.parseInt(datosVehiculo[2]), tipoAuto, Double.parseDouble(datosVehiculo[3].replaceAll("Q.", "").replaceAll("/día", "")), true);
 					vistaReservacion vistaRes = new vistaReservacion();
-					vistaRes.mostrarFormularioReservacion(vehiculoSeleccionado, frame, currentUsuario);
+					vistaRes.mostrarFormularioReservacion(vehiculoSeleccionado, frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
 				}
 			}
 		});
 		frame.getContentPane().add(reservarBtn);
-
     }
 
-    public void redireccionarPerfil(JFrame frame, Usuario currentUsuario){
-		drawMainButtons(frame, currentUsuario);
+    public void redireccionarPerfil(JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl){
+		drawMainButtons(frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
 
         JLabel profileTitleLbl = new JLabel("Perfil de Usuario");
 		profileTitleLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 23));
@@ -593,20 +594,9 @@ public class vistaInicioSesion {
 		largeProfileLbl.setBounds(15,0,300,300);
         frame.getContentPane().add(largeProfileLbl);
 
-        String[] licencias = {"29518261", "52912112", "1582925"}; // DEBERÍA DE SER usuario.getLicencias(), TODAVIA NO EXISTE EL MÉTODO.
-        String licenciasLblString = "<html>";
-        int licenciasLblHeight = 0;
-        int j = 0;
-        for(String l : licencias){
-            licenciasLblString += ("<br/> - " + l);
-            licenciasLblHeight += 28 * j;
-            j++;
-        }
-		licenciasLblString += "</html>";
-
-        JLabel licenciasListLabel = new JLabel(licenciasLblString);
+        JLabel licenciasListLabel = new JLabel(String.valueOf(currentUsuario.getNumDocLicencia()));
 		licenciasListLabel.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 16));
-		licenciasListLabel.setBounds(46, 380, 139, licenciasLblHeight);
+		licenciasListLabel.setBounds(46, 380, 139, 23);
 		frame.getContentPane().add(licenciasListLabel);
 		
 		JLabel licenciaLbl = new JLabel("Licencias Asociadas:");
@@ -619,7 +609,7 @@ public class vistaInicioSesion {
 		telefonoTxtLabel.setBounds(10, 240, 71, 31);
 		frame.getContentPane().add(telefonoTxtLabel);
 
-        JLabel telefonoValueLbl = new JLabel("42165624"); // FALTA COLOCAR .getTelefono() COMO MÉTODO DE USUARIO
+        JLabel telefonoValueLbl = new JLabel(String.valueOf(currentUsuario.getNumTelefono())); // FALTA COLOCAR .getTelefono() COMO MÉTODO DE USUARIO
 		telefonoValueLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 17));
 		telefonoValueLbl.setBounds(91, 240, 150, 31);
 		frame.getContentPane().add(telefonoValueLbl);
@@ -646,35 +636,68 @@ public class vistaInicioSesion {
 		frame.getContentPane().add(correoValueLbl);
     }
 
-	public void redireccionarReservas(JFrame frame, Usuario currentUsuario) {
-		drawMainButtons(frame, currentUsuario);
+	public void redireccionarReservas(JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
+		drawMainButtons(frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
 
 		JLabel reservasTitleLbl = new JLabel("Reservas Actuales");
 		reservasTitleLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 23));
 		reservasTitleLbl.setBounds(85, 37, 175, 38);		
 		frame.getContentPane().add(reservasTitleLbl);
 
-		// FALTA IMPLEMENTAR LÓGICA DE OBTENER LOS DATOS DE LAS RESERVAS Y MOSTRARLAS COMO LISTA.
-		/*
-		String[] reservas = currentUsuario.getReservas();
-        String reservasLblString = "<html> ";
-        int reservasLblHeight = 0;
-		int k = 0;
-        for(String l : reservas){
-            reservasLblString += (l + "<br/>");
-			reservasLblHeight += 25 * k;
-			k++;
-        }
-		*/
-		
-		// ESTA DECLARACIÓN DE SCROLLPANE SERÍA:
-		// JScrollPane reservasPane = new JScrollPane(new JLabel(reservasLblString));
-		JScrollPane reservasPane = new JScrollPane();
-		reservasPane.setBounds(10, 85, 324, 445);
-		reservasPane.setViewportView(new JLabel("Reservas"));
-		reservasPane.setBorder(null);
+		String[] reservasArray = new String[currentUsuario.getReservasAsociadas().size()];
+		for(int i = 0; i < currentUsuario.getReservasAsociadas().size(); i++){
+			reservasArray[i] = currentUsuario.getReservasAsociadas().get(i).toString();
+		}
+
+		JList<String> listReservas = new JList<String>(reservasArray);
+		listReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		listReservas.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 10));
+
+		JScrollPane reservasPane = new JScrollPane(listReservas);
+		reservasPane.setBounds(10, 86, 324, 357);
 		reservasPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		reservasPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		frame.getContentPane().add(reservasPane);
+		
+		JButton eliminarRsrvBtn = new JButton("Eliminar");
+		eliminarRsrvBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 18));
+		eliminarRsrvBtn.setBounds(115, 470, 117, 38);
+		eliminarRsrvBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				String seleccionada = listReservas.getSelectedValue().toString();
+				String[] seleccionadaArray = seleccionada.split(",");
+				int id = Integer.parseInt(seleccionadaArray[0]);
+				int vehiculoID = Integer.parseInt(seleccionadaArray[1]);
+				String marca = seleccionadaArray[2];
+				String modelo = seleccionadaArray[3];
+				int año = Integer.parseInt(seleccionadaArray[4]);
+				LocalDate fechaInicio = LocalDate.parse(seleccionadaArray[5]);
+				LocalDate fechaFin = LocalDate.parse(seleccionadaArray[6]);
+				double monto = Double.parseDouble(seleccionadaArray[7]);
+				Reserva reserva = new Reserva(id, new Vehiculo(vehiculoID, marca, modelo, año, null, 0, false), fechaInicio, fechaFin, monto);
+				for(Reserva r : currentUsuario.getReservasAsociadas()){
+					if(r.getId() == id){
+						currentUsuario.getReservasAsociadas().remove(r);
+						break;
+					}
+				}
+				userControl.actualizarReservasUsuario(currentUsuario.getID(), currentUsuario.getReservasAsociadas());
+				String[] reservasArray = new String[currentUsuario.getReservasAsociadas().size()];
+				for(int i = 0; i < currentUsuario.getReservasAsociadas().size(); i++){
+					reservasArray[i] = currentUsuario.getReservasAsociadas().get(i).toString();
+				}
+
+				listReservas.removeAll();
+				listReservas.setListData(reservasArray);
+				listReservas.revalidate();
+				listReservas.repaint();
+				frame.getContentPane().revalidate();
+				frame.repaint();
+				reservasPane.revalidate();
+				reservasPane.repaint();
+				
+			}
+		});
+		frame.getContentPane().add(eliminarRsrvBtn);
 	}
 }
