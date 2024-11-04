@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.Array;
 import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
@@ -23,9 +24,8 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 public class vistaInicioSesion {
-	boolean credentialisValidated = false;
 
-    public void mostrarFormulario(JFrame frame) {
+    public void mostrarFormulario(JFrame frame, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
 		//preparar pantalla
         frame.getContentPane().removeAll();
         frame.repaint();
@@ -105,9 +105,6 @@ public class vistaInicioSesion {
 		loginBtn_1.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 15));
 		loginBtn_1.setBounds(109, 320, 121, 47);
         loginBtn_1.setBackground(Color.WHITE);
-        // CONDICIONAL QUE VENDRÁ DE VALIDAR LOS DATOS DEL USUARIO, FALTA IMPLEMENTAR
-		Usuario usuarioActual = new Usuario(298649667, "Santiago Cordero Quirós", "cor24472@uvg.edu.gt", "pepe123", "Turismo",1289561212,22000000, new ArrayList<Reserva>());
-		//usuario actual, prueba momentanea
 		loginBtn_1.addActionListener(new ActionListener() {		
 			public void actionPerformed(ActionEvent e) {
 				String passwordIngresado = new String(passwordField.getPassword());
