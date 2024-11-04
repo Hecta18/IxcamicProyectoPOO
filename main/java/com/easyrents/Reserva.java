@@ -86,4 +86,9 @@ public class Reserva {
         return "Reserva [id=" + id + ", usuario=" + usuario + ", vehiculo=" + vehiculo + ", fechaInicio=" + fechaInicio
                 + ", fechaFin=" + fechaFin + ", monto=" + monto + "]";
     }
+
+	public char[] toCSV() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'toCSV'");
+	}
 }

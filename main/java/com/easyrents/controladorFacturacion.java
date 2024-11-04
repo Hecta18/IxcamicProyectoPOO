@@ -5,11 +5,11 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.kernel.pdf.PdfDocument;
 
-public class ControladorFacturacion {
+public class controladorFacturacion {
     private VistaFacturacion vistaFactura;
 
     // CONSTRUCTOR
-    public ControladorFacturacion(VistaFacturacion vistaFactura) {
+    public controladorFacturacion(VistaFacturacion vistaFactura) {
         this.vistaFactura = vistaFactura;
     }
 

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +29,8 @@ public class controladorReservacion {
             while ((linea = br.readLine()) != null) {
                 String[] valores = linea.split(",");
                 int id = Integer.parseInt(valores[0]);
-                String usuario = valores[1];
-                String vehiculo = valores[2];
+                Usuario usuario = new Usuario(id, linea, linea, filePath, linea, id, id);
+                Vehiculo vehiculo = new Vehiculo(id, linea, filePath, id, linea, id, false);
                 LocalDate fechaInicio = LocalDate.parse(valores[3]);
                 LocalDate fechaFin = LocalDate.parse(valores[4]);
                 double monto = Double.parseDouble(valores[5]);
