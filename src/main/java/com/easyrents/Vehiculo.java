@@ -1,4 +1,4 @@
-package com.easyrents;
+package main.java.com.easyrents;
 
 import java.time.Year;
 import java.util.Objects;

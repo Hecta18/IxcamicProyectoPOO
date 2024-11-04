@@ -1,5 +1,4 @@
-package com.easyrents;
-
+package main.java.com.easyrents;
 import java.util.Objects;
 
 public class Usuario {

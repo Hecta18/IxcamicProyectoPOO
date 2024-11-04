@@ -1,17 +1,12 @@
-package com.easyrents;
+package main.java.com.easyrents;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class controladorUsuario {
     private vistaInicioSesion vistaInicioSesion; // Vista para el inicio de sesión
     private List<Usuario> listaUsuarios; // Lista de usuarios cargada desde el archivo CSV
-    private Usuario usuarioActual; // Usuario actualmente autenticado
     
         // Constructor que inicializa la vista y carga usuarios desde el archivo CSV
         public controladorUsuario(vistaInicioSesion vistaInicioSesion) {
@@ -20,15 +15,22 @@ public class controladorUsuario {
         }
     
         // Método para cargar usuarios desde un archivo CSV
-        private List<Usuario> cargarUsuariosDesdeCSV(String filePath) {
-            List<Usuario> usuarios = new ArrayList<>();
+        // Los usuarios se guardarán de la siguiente forma:
+        // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
+        private ArrayList<Usuario> cargarUsuariosDesdeCSV(String filePath) {
+            ArrayList<Usuario> usuarios = new ArrayList<>();
             try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                 String linea;
                 while ((linea = br.readLine()) != null) {
                     String[] valores = linea.split(",");
-                    String correo = valores[0];
-                    String contraseña = valores[1];
-                    Usuario usuario = new Usuario(0, linea, correo, contraseña, contraseña, 0, 0); // Crear usuario con datos del CSV
+                    int ID = Integer.parseInt(valores[0]);
+                    String nombre = valores[1];
+                    String correo = valores[2];
+                    String contraseña = valores[3];
+                    String tipoUsuario = valores[4];
+                    long numDocLicencia = Long.parseLong(valores[5]);
+                    int numTelefono = Integer.parseInt(valores[6]);
+                    Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono); // Crear usuario con datos del CSV
                     usuarios.add(usuario);
                 }
             } catch (IOException e) {
@@ -38,12 +40,37 @@ public class controladorUsuario {
         }
     
         // Método para guardar un nuevo usuario en el archivo CSV
+        // Los usuarios se guardarán de la siguiente forma:
+        // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
         private void guardarUsuarioEnCSV(Usuario usuario, String filePath) {
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) {
-                bw.write(usuario.toCSV()); // Asume que Usuario tiene un método `toCSV` para formateo
-                bw.newLine();
-            } catch (IOException e) {
-                vistaInicioSesion.mostrarError("Error al guardar usuario en el archivo CSV: " + e.getMessage());
+            File file = new File(filePath);
+            String userDataString = usuario.getID() + "," + usuario.getNombre() + "," + usuario.getCorreo() + "," + usuario.getContraseña() + "," + usuario.getTipoUsuario() + "," + usuario.getNumDocLicencia() + "," + usuario.getNumTelefono();
+            if(file.exists()){
+                String line;
+                ArrayList<String> data = new ArrayList<>();
+                try(BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                    while((line = br.readLine()) != null) {
+                        data.add(line);
+                    }
+                }catch (IOException e) {
+                    System.out.println("Error al abrir el archivo, revise el nombre ingresado.");
+                }
+                data.add(userDataString);
+                try(BufferedWriter br = new BufferedWriter(new FileWriter(filePath))){
+                    for(String u : data){
+                        br.write(u);
+                        br.newLine();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                try(BufferedWriter br = new BufferedWriter(new FileWriter(filePath))){
+                    br.write(userDataString);
+                    br.newLine();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     
@@ -53,14 +80,13 @@ public class controladorUsuario {
                 vistaInicioSesion.mostrarError("El correo y la contraseña son obligatorios.");
                 return;
             }
-    
-            Usuario usuario = obtenerUsuarioPorCorreo(correo); // Buscar usuario en la lista
-            if (usuario != null && usuario.getContraseña().equals(contraseña)) {
-                usuarioActual = usuario; // Autenticar al usuario
-            vistaInicioSesion.mostrarExito("Inicio de sesión exitoso.");
-        } else {
-            vistaInicioSesion.mostrarError("Correo o contraseña incorrectos.");
-        }
+            // Nombre del archivo default: usuarios.csv
+            ArrayList<Usuario> listaUsuarios = cargarUsuariosDesdeCSV("usuarios.csv");
+            for (Usuario u : listaUsuarios){
+                if(u.getCorreo().equals(correo) && contraseña.equals(u.getContraseña())){
+                    // FALTA
+                }
+            }
     }
 
     // Método para registrar un nuevo usuario en el sistema

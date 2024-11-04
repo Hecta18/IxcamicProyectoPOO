@@ -1,5 +1,4 @@
-package com.easyrents;
-
+package main.java.com.easyrents;
 import java.awt.BorderLayout;
 
 import javax.swing.JFrame;

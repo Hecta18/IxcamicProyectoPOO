@@ -1,4 +1,4 @@
-package com.easyrents;
+package main.java.com.easyrents;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -1,5 +1,4 @@
-package com.easyrents;
-
+package main.java.com.easyrents;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -140,9 +139,6 @@ public class vistaReservacion {
 		
 					LocalDate fechaInicioDate = LocalDate.from(fechaInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
 					LocalDate fechaFinalDate = LocalDate.from(fechaFinal.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		
-					// Conversión de Date a LocalDate
-					LocalDate fechaInicioLocalDate = fechaInicioDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 					
 					double precioPagar = vehiculo.getTarifaDiaria() * numDias;
 					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
