@@ -1,11 +1,11 @@
 package main.java.com.easyrents;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+
+import javax.swing.JOptionPane;
 
 public class controladorVehiculo {
 
@@ -38,8 +38,8 @@ public class controladorVehiculo {
     }
 
     // Método que busca vehículos en la lista cargada desde el archivo CSV
-    public List<Vehiculo> buscarVehiculos(String tipo, ArrayList<Vehiculo> vehiculosList) {
-        List<Vehiculo> resultados = new ArrayList<>();
+    public ArrayList<Vehiculo> buscarVehiculos(String tipo, ArrayList<Vehiculo> vehiculosList) {
+        ArrayList<Vehiculo> resultados = new ArrayList<>();
         for (Vehiculo vehiculo : vehiculosList) {
             // Comprobación de coincidencias con los criterios de búsqueda
             boolean coincideTipo = (tipo == null || vehiculo.getTipo().equalsIgnoreCase(tipo));

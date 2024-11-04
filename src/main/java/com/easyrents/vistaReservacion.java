@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -17,13 +17,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class vistaReservacion {
-    public void mostrarFormularioReservacion(Vehiculo vehiculo, JFrame frame, Usuario currentUsuario) {
+    public void mostrarFormularioReservacion(Vehiculo vehiculo, JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
 
         vistaInicioSesion vistaInicioSesion = new vistaInicioSesion();
         frame.getContentPane().removeAll();
         frame.repaint();
 
-        vistaInicioSesion.drawMainButtons(frame, currentUsuario);
+        vistaInicioSesion.drawMainButtons(frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
 
         JLabel vehiculoImageLbl = new JLabel("");
 		vehiculoImageLbl.setBounds(10, 10, 154, 154);
@@ -31,7 +31,7 @@ public class vistaReservacion {
             case "Motocicleta":
                 vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/motoIcon.png")));
                 break;
-            case "Automóvil particular":
+            case "Automovil particular":
                 vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sedanIcon.png")));
                 break;
             case "Bus particular":
@@ -191,7 +191,13 @@ public class vistaReservacion {
 					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
 					// Reserva de prueba
 					Reserva reservaNueva = new Reserva(0, currentUsuario, vehiculo, fechaInicioDate, fechaFinalDate, precioPagar);
-					// currentUsuario.getReservas().add(reservaNueva);
+					currentUsuario.getReservasAsociadas().add(reservaNueva);
+					for (Usuario u : userList) {
+						if (u.getCorreo().equals(currentUsuario.getCorreo())) {
+							u.getReservasAsociadas().add(reservaNueva);
+						}
+					}
+					userControl.guardarUsuarioEnCSV(currentUsuario);
 				}catch(NumberFormatException nF){
 					mostrarError("Debe de llenar todos los campos de fecha solicitados.");
 				}

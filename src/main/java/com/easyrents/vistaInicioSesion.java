@@ -7,8 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -16,11 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
 public class vistaInicioSesion {
@@ -96,7 +96,7 @@ public class vistaInicioSesion {
         createAccountBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
-                redireccionarCrearCuenta(frame);
+                redireccionarCrearCuenta(frame, userList, vehicleList, userControl, vehicleControl);
             }
         });
 		frame.getContentPane().add(createAccountBtn);
@@ -115,11 +115,16 @@ public class vistaInicioSesion {
 				} else if (!correoIngresado.contains("@")) {
 					mostrarError("Debe de ingresar una dirección de correo válida");
 					return;
-				} else if (!(correoIngresado.equals(usuarioActual.getCorreo()) && passwordIngresado.equals(usuarioActual.getContraseña()))) {
-					mostrarError("Las credenciales ingresadas no son correctas, vuelva a intentar.");
-					return;
 				} else {
-					redireccionarDashboard(frame, usuarioActual);
+					for(Usuario u : userList){
+						if(u.getCorreo().equals(correoIngresado) && new String(passwordField.getPassword()).equals(u.getContraseña())){
+							redireccionarDashboard(frame, u);
+							return;
+						}else{
+							mostrarError("La contraseña o el correo ingresado no son correctos.");
+							return;
+						}
+					}
 				}
 			}
 		});
@@ -139,7 +144,7 @@ public class vistaInicioSesion {
 
     }
 
-	public void drawMainButtons(JFrame frame, Usuario usuarioActual) {
+	public void drawMainButtons(JFrame frame, Usuario usuarioActual, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl ) {
 		frame.getContentPane().removeAll();
 		frame.repaint();
 		JLabel cerrarSesionLbl = new JLabel("Cerrar Sesión");
@@ -149,7 +154,7 @@ public class vistaInicioSesion {
 		cerrarSesionLbl.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				mostrarFormulario(frame);
+				mostrarFormulario(frame, userList, vehicleList, userControl, vehicleControl);
 			}
 
 			@Override
@@ -237,7 +242,7 @@ public class vistaInicioSesion {
         JOptionPane.showMessageDialog(null, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void redireccionarCrearCuenta(JFrame frame) {
+    public void redireccionarCrearCuenta(JFrame frame, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
         frame.getContentPane().removeAll();
         frame.repaint();
 
@@ -245,12 +250,12 @@ public class vistaInicioSesion {
 
         JButton backBtn = new JButton("Regresar");
 		backBtn.setBackground(Color.WHITE);
-		backBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 15));
-		backBtn.setBounds(257, 550, 87, 51);
+		backBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 13));
+		backBtn.setBounds(264, 556, 80, 45);
         backBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
-                mostrarFormulario(frame);
+                mostrarFormulario(frame, userList, vehicleList, userControl, vehicleControl);
             }
         });
 		frame.add(backBtn);
@@ -314,20 +319,20 @@ public class vistaInicioSesion {
 		
 		JLabel motivoLbl1 = new JLabel("¿Cuál es su motivo para");
 		motivoLbl1.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
-		motivoLbl1.setBounds(10, 366, 172, 29);
+		motivoLbl1.setBounds(10, 418, 172, 29);
 		frame.getContentPane().add(motivoLbl1);
 		
 		JLabel motivoLbl2 = new JLabel("utilizar nuestra app?");
 		motivoLbl2.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
-		motivoLbl2.setBounds(10, 387, 172, 29);
+		motivoLbl2.setBounds(10, 439, 172, 29);
 		frame.getContentPane().add(motivoLbl2);
 
-        JLabel dpiLabel = new JLabel("No. de DPI");
+        JLabel dpiLabel = new JLabel("Teléfono:");
 		dpiLabel.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
 		dpiLabel.setBounds(10, 310, 94, 29);
 		frame.getContentPane().add(dpiLabel);
 		
-		JTextField dpiEntry = new JTextField();
+		JTextField dpiEntry = new JTextField(); // ES REALMENTE EL TELÉFONO
 		dpiEntry.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
 		dpiEntry.setBounds(98, 318, 236, 26);
 		frame.getContentPane().add(dpiEntry);
@@ -336,6 +341,26 @@ public class vistaInicioSesion {
 		lblsinGuiones.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 12));
 		lblsinGuiones.setBounds(10, 326, 94, 29);
 		frame.getContentPane().add(lblsinGuiones);
+
+		JLabel lblsinGuiones2 = new JLabel("(sin guiones)");
+		lblsinGuiones2.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 12));
+		lblsinGuiones2.setBounds(10, 326, 94, 29);
+		frame.getContentPane().add(lblsinGuiones);
+		
+		JLabel lblsinGuiones_2 = new JLabel("(sin guiones)");
+		lblsinGuiones_2.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 12));
+		lblsinGuiones_2.setBounds(10, 382, 94, 29);
+		frame.getContentPane().add(lblsinGuiones_2);
+		
+		JLabel licenciaLbl1 = new JLabel("No. Licencia:");
+		licenciaLbl1.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
+		licenciaLbl1.setBounds(10, 366, 94, 29);
+		frame.getContentPane().add(licenciaLbl1);
+
+		JTextField licenciaEntry = new JTextField();
+		licenciaEntry.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
+		licenciaEntry.setBounds(98, 374, 236, 26);
+		frame.getContentPane().add(licenciaEntry);
 
         JLabel razonExtraLbl = new JLabel("Especifique:");
 		razonExtraLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 15));
@@ -356,7 +381,7 @@ public class vistaInicioSesion {
 		tipoUsuarioDropDown.setModel(new DefaultComboBoxModel<String>(new String[] {"Turismo (cualquier índole)", "Trabajo", "Estudios", "Visitas a Familiares", "Residencia Temporal", "Otro (Especifique)"}));
 		tipoUsuarioDropDown.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
         tipoUsuarioDropDown.setBackground(Color.WHITE);
-		tipoUsuarioDropDown.setBounds(162, 376, 170, 29);
+		tipoUsuarioDropDown.setBounds(170, 428, 164, 29);
         tipoUsuarioDropDown.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 if(tipoUsuarioDropDown.getSelectedItem().toString() == "Otro (Especifique)"){
@@ -375,7 +400,8 @@ public class vistaInicioSesion {
 
 		crearCuentaBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 22));
         crearCuentaBtn.setBackground(Color.WHITE);
-		crearCuentaBtn.setBounds(91, 435, 165, 52);
+		crearCuentaBtn.setBounds(98, 521, 155, 54);
+		int randomID = new Random().nextInt(999999998) + 1;
         crearCuentaBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 ArrayList<String> values = new ArrayList<>();//posible unchecked
@@ -384,7 +410,8 @@ public class vistaInicioSesion {
                 values.add(new String(passwordField.getPassword()));
                 values.add(new String(passwordFieldConfirmar.getPassword()));
                 values.add(tipoUsuarioDropDown.getSelectedItem().toString());
-                values.add(String.valueOf(Long.parseLong(dpiEntry.getText())));
+				values.add(String.valueOf(Long.parseLong(licenciaEntry.getText())));
+                values.add(String.valueOf(Integer.parseInt(dpiEntry.getText()))); // ESTO ES REALMENTE EL TELÉFONO
 
                 for(String s : values){
                     if (s.replaceAll("\\s+","").equals("")){
@@ -414,12 +441,14 @@ public class vistaInicioSesion {
                     }
                     // FALTA IMPLEMENTAR LÓGICA DE CREAR USUARIO Y GUARDARLO EN LA BASE DE DATOS.
                     mostrarExito("Se ha creado su cuenta exitosamente!");
-					// listaUsuarios.add(usuarioActual);
+					Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), values.get(4), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
+					userList.add(nuevoUsuario);
+					userControl.guardarUsuarioEnCSV(nuevoUsuario);
                     return;
                 }else{
-                    values.add(razonExtra.getText());
-                    mostrarExito("Se ha creado su cuenta exitosamente!");
-					// listaUsuarios.add(usuarioActual);
+                    Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), razonExtra.getText(), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
+					userList.add(nuevoUsuario);
+					userControl.guardarUsuarioEnCSV(nuevoUsuario);
                     return;
                 }
             }
@@ -427,8 +456,8 @@ public class vistaInicioSesion {
 		frame.getContentPane().add(crearCuentaBtn);		
     }
 
-    public void redireccionarDashboard(JFrame frame, Usuario currentUsuario) {
-		drawMainButtons(frame, currentUsuario);
+    public void redireccionarDashboard(JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
+		drawMainButtons(frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
 		
 		JLabel dashboardTitleLbl = new JLabel("Página Principal");
 		dashboardTitleLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 23));
@@ -443,7 +472,7 @@ public class vistaInicioSesion {
 		// EN EL SCROLLPANE IRÁN TODOS LOS RESULTADOS DE BUSCAR EN LA BASE DE DATOS EL TIPO DE VEHÍCULO CON EL COMBOBOX
         @SuppressWarnings("rawtypes")
 		JComboBox<String> tipoVehiculoDropDown = new JComboBox();
-		tipoVehiculoDropDown.setModel(new DefaultComboBoxModel(new String[] {"Motocicleta", "Automóvil particular", "Bus particular"}));
+		tipoVehiculoDropDown.setModel(new DefaultComboBoxModel(new String[] {"Motocicleta", "Automovil particular", "Bus particular"}));
         tipoVehiculoDropDown.setBackground(Color.WHITE);
 		tipoVehiculoDropDown.setSelectedItem(null);
 
@@ -458,11 +487,25 @@ public class vistaInicioSesion {
 
         tipoVehiculoDropDown.addActionListener(e -> {
 			String seleccionado = tipoVehiculoDropDown.getSelectedItem().toString();
-			String[] datos = new String[2]; // Sacar de la base de datos todos los datos de los vehículos parseados como una lista de Strings
-			// Filtrar los datos por cada uno de los tipos
-			String[] datosFiltradosMotos = {"Ducati Panigale 2016 Q.350/día", "Harley Davidson 2024 Q.250/día"};
-			String[] datosFiltradosAutos = {"Audi R8 2024 Q.500/día", "BMW M3 2023 Q.600/día"};
-			String[] datosFiltradosBuses = {"Audi RS99 2015 Q.1250/día", "Mazda T3500 2017 Q.950/día"};
+			ArrayList<Vehiculo> datos = vehicleControl.buscarVehiculos(seleccionado, vehicleList);
+			ArrayList<Vehiculo> datosFiltradosMotos = vehicleControl.buscarVehiculos("Motocicleta", vehicleList);
+			ArrayList<Vehiculo> datosFiltradosAutos = vehicleControl.buscarVehiculos("Automovil particular", vehicleList);
+			ArrayList<Vehiculo> datosFiltradosBuses = vehicleControl.buscarVehiculos("Bus particular", vehicleList);
+			int sizeMotos = datosFiltradosMotos.size();
+			int sizeAutos = datosFiltradosAutos.size();
+			int sizeBuses = datosFiltradosBuses.size();
+			String[] datosFiltradosMotosArray = new String[sizeMotos];
+			for(int i = 0; i < sizeMotos; i++){
+				datosFiltradosMotosArray[i] = datosFiltradosMotos.get(i).getMarca() + " " + datosFiltradosMotos.get(i).getModelo() + " " + datosFiltradosMotos.get(i).getAño() + " ; Q." + datosFiltradosMotos.get(i).getTarifaDiaria() + "/día";
+			}
+			String[] datosFiltradosAutosArray = new String[sizeAutos];
+			for(int i = 0; i < sizeAutos; i++){
+				datosFiltradosAutosArray[i] = datosFiltradosAutos.get(i).getMarca() + " " + datosFiltradosAutos.get(i).getModelo() + " " + datosFiltradosAutos.get(i).getAño() + " ; Q." + datosFiltradosAutos.get(i).getTarifaDiaria() + "/día";
+			}
+			String[] datosFiltradosBusesArray = new String[sizeBuses];
+			for(int i = 0; i < sizeBuses; i++){
+				datosFiltradosBusesArray[i] = datosFiltradosBuses.get(i).getMarca() + " " + datosFiltradosBuses.get(i).getModelo() + " " + datosFiltradosBuses.get(i).getAño() + " ; Q." + datosFiltradosBuses.get(i).getTarifaDiaria() + "/día";
+			}
 			vehiculoDropDown.removeAll();
 			vehiculoDropDown.revalidate();
 			vehiculoDropDown.repaint();
@@ -472,13 +515,13 @@ public class vistaInicioSesion {
 			resultsScrollPane.repaint();
 			switch (seleccionado){
 				case "Motocicleta":
-					vehiculoDropDown.setListData(datosFiltradosMotos);
+					vehiculoDropDown.setListData(datosFiltradosMotosArray);
 					break;
 				case "Automóvil particular":
-					vehiculoDropDown.setListData(datosFiltradosAutos);
+					vehiculoDropDown.setListData(datosFiltradosAutosArray);
 					break;
 				case "Bus particular":
-					vehiculoDropDown.setListData(datosFiltradosBuses);
+					vehiculoDropDown.setListData(datosFiltradosBusesArray);
 					break;
 			}
 		});
@@ -504,8 +547,8 @@ public class vistaInicioSesion {
 						case "Motocicleta":
 							tipoAuto = "Motocicleta";
 							break;
-						case "Automóvil particular":
-							tipoAuto = "Automóvil particular";
+						case "Automovil particular":
+							tipoAuto = "Automovil particular";
 							break;
 						case "Bus particular":
 							tipoAuto = "Bus particular";
