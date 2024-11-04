@@ -29,13 +29,13 @@ public class vistaReservacion {
 		vehiculoImageLbl.setBounds(10, 10, 154, 154);
         switch(vehiculo.getTipo()){
             case "Motocicleta":
-                vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/resources/img/motoIcon.png")));
+                vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/motoIcon.png")));
                 break;
             case "Automóvil particular":
-                vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/resources/img/sedanIcon.png")));
+                vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sedanIcon.png")));
                 break;
             case "Bus particular":
-                vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/resources/img/busIcon.png")));
+                vehiculoImageLbl.setIcon(new javax.swing.ImageIcon(getClass().getResource("/busIcon.png")));
                 break;
         }
         frame.getContentPane().add(vehiculoImageLbl);

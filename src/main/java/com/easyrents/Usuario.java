@@ -1,4 +1,5 @@
 package main.java.com.easyrents;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Usuario {
@@ -9,10 +10,11 @@ public class Usuario {
     private String tipoUsuario;
     private long numDocLicencia;
     private int numTelefono;
+    private ArrayList<Reserva> reservasAsociadas;
     
     //METODO CONSTRUCTOR
     public Usuario(int id, String nombre, String correo, String contraseña, String tipoUsuario, long numDocLicencia,
-        int numTelefono) {
+        int numTelefono, ArrayList<Reserva> reservas) {
         this.id = id;
         this.nombre = nombre;
         this.correo = correo;
@@ -21,6 +23,7 @@ public class Usuario {
         this.tipoUsuario = tipoUsuario;
         this.numDocLicencia = numDocLicencia;
         this.numTelefono = numTelefono;
+        this.reservasAsociadas = reservas;
     }
 
     //GETTERS
@@ -32,22 +35,17 @@ public class Usuario {
     public String getTipoUsuario(){return tipoUsuario;}
     public long getNumDocLicencia(){return numDocLicencia;}
     public int getNumTelefono(){return numTelefono;}
+    public ArrayList<Reserva> getReservasAsociadas(){return this.reservasAsociadas;}
 
     //SETTERS
     public void setID(int id){this.id = id;}
     public void setNombre(String nombre){this.nombre = nombre;}
     public void setCorreo(String correo){this.correo = correo;}
-    public void setContraseña(String contraseña) { 
-        // Validar contraseña
-        if (contraseña.length() >= 6) {
-            this.contraseña = contraseña;
-        } else {
-            throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
-        }
-    }
+    public void setContraseña(String contraseña) {this.contraseña = contraseña;}
     public void setTipoUsuario(String tipoUsuario){this.tipoUsuario = tipoUsuario;}
     public void setNumDocLicencia(long numDocLicencia){this.numDocLicencia = numDocLicencia;}
     public void setNumTelefono(int numTelefono){this.numTelefono = numTelefono;}
+    public void setReservasAsociadas(ArrayList<Reserva> reservasAsociadas){this.reservasAsociadas = reservasAsociadas;}
 
     //EQUALS
     @Override
