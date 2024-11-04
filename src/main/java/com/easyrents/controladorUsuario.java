@@ -18,7 +18,7 @@ public class controladorUsuario {
         // Método para cargar usuarios desde un archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
         // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
-        private ArrayList<Usuario> cargarUsuariosDesdeCSV(String filePath) {
+        public ArrayList<Usuario> cargarUsuariosDesdeCSV(String filePath) {
             ArrayList<Usuario> usuarios = new ArrayList<>();
             try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
                 String linea;
@@ -48,7 +48,7 @@ public class controladorUsuario {
         // Método para guardar un nuevo usuario en el archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
         // ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono
-        private void guardarUsuarioEnCSV(Usuario usuario, String filePath) {
+        public void guardarUsuarioEnCSV(Usuario usuario, String filePath) {
             File file = new File(filePath);
             //convierte las reservaciones en un solo String
             String reservasString = usuario.getReservasAsociadas()
