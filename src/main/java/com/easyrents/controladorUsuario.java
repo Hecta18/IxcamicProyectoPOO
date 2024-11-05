@@ -36,43 +36,47 @@ public class controladorUsuario {
                         long numDocLicencia = Long.parseLong(valores[5]);
                         int numTelefono = Integer.parseInt(valores[6]);
                         String reservasArray = valores[7].substring(1, valores[7].length() - 1); // Quitar los {} de reservas
-
                         ArrayList<Reserva> reservas = new ArrayList<>();
-                        String[] reservasStrings = reservasArray.split("},\\{");
+                        if (reservasArray.equals("")){
+                            Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservas);
+                            usuarios.add(usuario);
+                        }else{
+                            String[] reservasStrings = reservasArray.split("},\\{");
                         
-                        for (String reservaStr : reservasStrings) {
-                            String[] reservaData = reservaStr.split(",", 6);
-                            int reservaID = Integer.parseInt(reservaData[0]);
-                            
-                            // Datos del vehículo
-                            String[] vehiculoData = reservaData[1].substring(1, reservaData[1].length() - 1).split(",");
-                            int vehiculoID = Integer.parseInt(vehiculoData[0]);
-                            String marca = vehiculoData[1];
-                            String modelo = vehiculoData[2];
-                            int año = Integer.parseInt(vehiculoData[3]);
-                            String tipo = vehiculoData[4];
-                            double tarifaDiaria = Double.parseDouble(vehiculoData[5]);
-                            boolean disponible = Boolean.parseBoolean(vehiculoData[6]);
+                            for (String reservaStr : reservasStrings) {
+                                String[] reservaData = reservaStr.split(",", 6);
+                                int reservaID = Integer.parseInt(reservaData[0]);
+                                
+                                // Datos del vehículo
+                                String[] vehiculoData = reservaData[1].substring(1, reservaData[1].length() - 1).split(",");
+                                int vehiculoID = Integer.parseInt(vehiculoData[0]);
+                                String marca = vehiculoData[1];
+                                String modelo = vehiculoData[2];
+                                int año = Integer.parseInt(vehiculoData[3]);
+                                String tipo = vehiculoData[4];
+                                double tarifaDiaria = Double.parseDouble(vehiculoData[5]);
+                                boolean disponible = Boolean.parseBoolean(vehiculoData[6]);
 
-                            // Instanciar el vehículo y la reserva
-                            Vehiculo vehiculo = new Vehiculo(vehiculoID, marca, modelo, año, tipo, tarifaDiaria, disponible);
-                            LocalDate fechaInicio = LocalDate.parse(reservaData[2]);
-                            LocalDate fechaFin = LocalDate.parse(reservaData[3]);
-                            double monto = Double.parseDouble(reservaData[4]);
-                            String estado = reservaData[5];
+                                // Instanciar el vehículo y la reserva
+                                Vehiculo vehiculo = new Vehiculo(vehiculoID, marca, modelo, año, tipo, tarifaDiaria, disponible);
+                                LocalDate fechaInicio = LocalDate.parse(reservaData[2]);
+                                LocalDate fechaFin = LocalDate.parse(reservaData[3]);
+                                double monto = Double.parseDouble(reservaData[4]);
+                                String estado = reservaData[5];
 
-                            Reserva reserva = new Reserva(reservaID, vehiculo, fechaInicio, fechaFin, monto);
-                            reservas.add(reserva);
+                                Reserva reserva = new Reserva(reservaID, vehiculo, fechaInicio, fechaFin, monto);
+                                reservas.add(reserva);
+                            }
+
+                            Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservas);
+                            usuarios.add(usuario);
                         }
-
-                        Usuario usuario = new Usuario(ID, nombre, correo, contraseña, tipoUsuario, numDocLicencia, numTelefono, reservas);
-                        usuarios.add(usuario);
-                        }
-                    }catch (IOException e) {
+                    }
+                }catch (IOException e){
                     JOptionPane.showMessageDialog(null,"Error al cargar usuarios desde el archivo CSV: " + e.getMessage());
                 }
-                return usuarios;
             }
+            return usuarios;
         }
     
         // Método para guardar un nuevo usuario en el archivo CSV
@@ -112,7 +116,6 @@ public class controladorUsuario {
                 usuario.getNumTelefono(),
                 reservasString
             );
-            System.out.println(usuario.getTipoUsuario());
 
             try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath, true))) {
                 br.write(userDataString);

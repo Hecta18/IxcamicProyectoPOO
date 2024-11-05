@@ -116,6 +116,10 @@ public class vistaInicioSesion {
 				} else if (!correoIngresado.contains("@")) {
 					mostrarError("Debe de ingresar una dirección de correo válida");
 					return;
+				// Revisa si la longitud es menor que 8, si tiene números y si tiene una mayúscula
+				} else if (passwordIngresado.length() < 8 && passwordIngresado.equals(new String(passwordIngresado.replaceAll("\\s+","")))) {
+					mostrarError("La contraseña debe tener al menos 8 caracteres, un número y una mayúscula");
+					return;
 				} else {
 					if (userList.isEmpty()){
 						mostrarError("No existe ningún usuario registrado actualmente");
@@ -125,11 +129,9 @@ public class vistaInicioSesion {
 						if(u.getCorreo().equals(correoIngresado) && new String(passwordField.getPassword()).equals(u.getContraseña())){
 							redireccionarDashboard(frame, u, userList, vehicleList, userControl, vehicleControl);
 							return;
-						}else{
-							mostrarError("La contraseña o el correo ingresado no son correctos.");
-							return;
 						}
 					}
+					mostrarError("El correo o contraseña ingresados no son correctos.");
 				}
 			}
 		});
@@ -146,7 +148,6 @@ public class vistaInicioSesion {
 		logoNameImgLbl.setIcon(new ImageIcon(logoNameImg));
 		logoNameImgLbl.setBounds(84, 106, 177, 50);
 		frame.getContentPane().add(logoNameImgLbl);
-
     }
 
 	public void drawMainButtons(JFrame frame, Usuario usuarioActual, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl ) {
@@ -370,12 +371,12 @@ public class vistaInicioSesion {
         JLabel razonExtraLbl = new JLabel("Especifique:");
 		razonExtraLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 15));
 		razonExtraLbl.setVisible(false);
-		razonExtraLbl.setBounds(24, 426, 80, 20);
+		razonExtraLbl.setBounds(24, 478, 80, 20);
 		frame.getContentPane().add(razonExtraLbl);
 		
 		JTextField razonExtra = new JTextField();
 		razonExtra.setVisible(false);
-		razonExtra.setBounds(105, 425, 217, 29);
+		razonExtra.setBounds(105, 477, 217, 29);
 		frame.getContentPane().add(razonExtra);
 
         JButton crearCuentaBtn = new JButton("Crear Cuenta");
@@ -387,6 +388,17 @@ public class vistaInicioSesion {
 		tipoUsuarioDropDown.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 14));
         tipoUsuarioDropDown.setBackground(Color.WHITE);
 		tipoUsuarioDropDown.setBounds(170, 428, 164, 29);
+		tipoUsuarioDropDown.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(tipoUsuarioDropDown.getSelectedItem().toString().equals("Otro (Especifique)")){
+					razonExtra.setVisible(true);
+					razonExtraLbl.setVisible(true);
+				}else{
+					razonExtra.setVisible(false);
+					razonExtraLbl.setVisible(false);
+				}
+			}
+		});
 		frame.getContentPane().add(tipoUsuarioDropDown);
 
 		crearCuentaBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 22));
@@ -405,11 +417,18 @@ public class vistaInicioSesion {
                 values.add(String.valueOf(Integer.parseInt(dpiEntry.getText()))); // ESTO ES REALMENTE EL TELÉFONO
 
                 for(String s : values){
-                    if (s.replaceAll("\\s+","").equals("")){
+                    if (s.equals("")){
                         mostrarError("Debe de llenar todos los campos solicitados");
                         return;
                     }
                 }
+
+				for(Usuario u : userList){
+					if(u.getCorreo().equals(values.get(1))){
+						mostrarError("El correo ingresado ya está registrado en la base de datos.");
+						return;
+					}
+				}
 
                 // Verificar que el correo sea válido (que tenga una @ por lo menos):
                 if(!values.get(1).contains("@")){
@@ -428,17 +447,18 @@ public class vistaInicioSesion {
                         mostrarError("Debe de llenar todos los campos solicitados.");
                         return;
                     }else{
-                        values.add(razonExtra.getText());
+                        values.add(4, razonExtra.getText());
                     }
                     // FALTA IMPLEMENTAR LÓGICA DE CREAR USUARIO Y GUARDARLO EN LA BASE DE DATOS.
                     mostrarExito("Se ha creado su cuenta exitosamente!");
-					Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), values.get(4), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
+					
+					Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), razonExtra.getText(), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
 					userList.add(nuevoUsuario);
 					userControl.guardarUsuarioEnCSV(nuevoUsuario);
                     return;
                 }else{
 					mostrarExito("Se ha creado su cuenta exitosamente!");
-                    Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), razonExtra.getText(), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
+                    Usuario nuevoUsuario = new Usuario(randomID, values.get(0), values.get(1), values.get(2), values.get(4), Long.parseLong(values.get(5)), Integer.parseInt(values.get(6)), new ArrayList<Reserva>());
 					userList.add(nuevoUsuario);
 					userControl.guardarUsuarioEnCSV(nuevoUsuario);
                     return;
