@@ -117,10 +117,7 @@ public class vistaInicioSesion {
 					mostrarError("Debe de ingresar una dirección de correo válida");
 					return;
 				// Revisa si la longitud es menor que 8, si tiene números y si tiene una mayúscula
-				} else if (passwordIngresado.length() < 8 && passwordIngresado.equals(new String(passwordIngresado.replaceAll("\\s+","")))) {
-					mostrarError("La contraseña debe tener al menos 8 caracteres, un número y una mayúscula");
-					return;
-				} else {
+				}else {
 					if (userList.isEmpty()){
 						mostrarError("No existe ningún usuario registrado actualmente");
 						return;
@@ -195,7 +192,7 @@ public class vistaInicioSesion {
 		Image profileImg = new ImageIcon(getClass().getResource("/profileIconSmall.png")).getImage();
 		Image profileImgHover = new ImageIcon(getClass().getResource("/profileIconSmallHover.png")).getImage();
 		JButton perfilBtn = new JButton("");
-		perfilBtn.setBounds(244, 545, 50, 50);
+		perfilBtn.setBounds(187, 545, 50, 50);
 		perfilBtn.setBorderPainted(false);
 		perfilBtn.setContentAreaFilled(false);
 		perfilBtn.setIcon(new ImageIcon(profileImg));
@@ -210,7 +207,7 @@ public class vistaInicioSesion {
 		Image verReservasImg = new ImageIcon(getClass().getResource("/menuIcon.png")).getImage();
 		Image verReservasImgHover = new ImageIcon(getClass().getResource("/menuIconHover.png")).getImage();
 		JButton verReservasBtn = new JButton("");
-		verReservasBtn.setBounds(41, 545, 50, 50);
+		verReservasBtn.setBounds(15, 545, 50, 50);
 		verReservasBtn.setBorderPainted(false);
 		verReservasBtn.setContentAreaFilled(false);
 		verReservasBtn.setIcon(new ImageIcon(verReservasImg));
@@ -225,7 +222,7 @@ public class vistaInicioSesion {
 		Image homeImg = new ImageIcon(getClass().getResource("/homeIcon.png")).getImage();
 		Image homeImgHover = new ImageIcon(getClass().getResource("/homeIconHover.png")).getImage();
 		JButton homeBtn = new JButton();
-		homeBtn.setBounds(141, 545, 50, 50);
+		homeBtn.setBounds(101, 545, 50, 50);
 		homeBtn.setBorderPainted(false);
 		homeBtn.setContentAreaFilled(false);
 		homeBtn.setIcon(new ImageIcon(homeImg));
@@ -237,6 +234,25 @@ public class vistaInicioSesion {
 			}
 		});
 		frame.getContentPane().add(homeBtn);
+
+
+		ImageIcon mapImg = new ImageIcon(getClass().getResource("/mapIcon.png"));
+		Image mapImgHover = new ImageIcon(getClass().getResource("/mapIconHover.png")).getImage();
+		JButton mapBtn = new JButton("");
+		mapBtn.setBounds(273, 545, 50, 50);
+		mapBtn.setBorderPainted(false);
+		mapBtn.setContentAreaFilled(false);
+		mapBtn.setIcon(mapImg);
+		mapBtn.setRolloverIcon(new ImageIcon(mapImgHover));
+		mapBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent a) {
+				// IMPLEMENTAR AQUÍ EL MAPA
+			}
+		});
+		frame.getContentPane().add(mapBtn);
+
+
+		// ESTO SIEMPRE TIENE QUE IR DE ÚLTIMO
 		frame.getContentPane().setComponentZOrder(franjaLbl, frame.getContentPane().getComponentCount() - 1);
 	}
 
@@ -441,6 +457,28 @@ public class vistaInicioSesion {
                     mostrarError("Debe de ingresar la misma contraseña en ambos campos");
                     return;
                 }
+				
+
+				if (values.get(2).length() < 8) {
+					mostrarError("La contraseña debe tener al menos 8 caracteres.");
+					return;
+				}
+
+				// Revisar si la contraseña tiene mayúsculas y minúsculas
+				boolean mayus = false;
+				boolean number = false;
+				for (int i = 0; i < values.get(2).length(); i++) {	
+					if (Character.isUpperCase(values.get(2).charAt(i))) {
+						mayus = true;
+					}else if (Character.isDigit(values.get(2).charAt(i))) {
+						number = true;
+					}
+				}
+
+				if (!mayus || !number) {
+					mostrarError("La contraseña debe contener al menos una letra mayúscula y una numero.");
+					return;
+				}
 
                 if(razonExtra.isVisible()){
                     if (razonExtra.getText().replaceAll("\\s+","").equals("")){
@@ -471,6 +509,10 @@ public class vistaInicioSesion {
     public void redireccionarDashboard(JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
 		drawMainButtons(frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
 		
+		for (Reserva r : currentUsuario.getReservasAsociadas()) {
+			System.out.println(r.toString());
+		}
+
 		JLabel dashboardTitleLbl = new JLabel("Página Principal");
 		dashboardTitleLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 23));
 		dashboardTitleLbl.setBounds(91, 37, 166, 38);
@@ -501,7 +543,7 @@ public class vistaInicioSesion {
 			String seleccionado = tipoVehiculoDropDown.getSelectedItem().toString();
 			ArrayList<Vehiculo> datos = vehicleControl.buscarVehiculos(seleccionado, vehicleList);
 			ArrayList<Vehiculo> datosFiltradosMotos = vehicleControl.buscarVehiculos("Motocicleta", vehicleList);
-			ArrayList<Vehiculo> datosFiltradosAutos = vehicleControl.buscarVehiculos("Automovil particular", vehicleList);
+			ArrayList<Vehiculo> datosFiltradosAutos = vehicleControl.buscarVehiculos("Automovil Particular", vehicleList);
 			ArrayList<Vehiculo> datosFiltradosBuses = vehicleControl.buscarVehiculos("Bus particular", vehicleList);
 			int sizeMotos = datosFiltradosMotos.size();
 			int sizeAutos = datosFiltradosAutos.size();
@@ -518,6 +560,7 @@ public class vistaInicioSesion {
 			for(int i = 0; i < sizeBuses; i++){
 				datosFiltradosBusesArray[i] = datosFiltradosBuses.get(i).getMarca() + " " + datosFiltradosBuses.get(i).getModelo() + " " + datosFiltradosBuses.get(i).getAño() + " Q." + datosFiltradosBuses.get(i).getTarifaDiaria() + "/día";
 			}
+
 			vehiculoDropDown.removeAll();
 			vehiculoDropDown.revalidate();
 			vehiculoDropDown.repaint();
@@ -529,7 +572,7 @@ public class vistaInicioSesion {
 				case "Motocicleta":
 					vehiculoDropDown.setListData(datosFiltradosMotosArray);
 					break;
-				case "Automóvil particular":
+				case "Automovil particular":
 					vehiculoDropDown.setListData(datosFiltradosAutosArray);
 					break;
 				case "Bus particular":
@@ -595,7 +638,7 @@ public class vistaInicioSesion {
         }
         userNameLblString += "</html>";
 		JLabel userNameLbl = new JLabel(userNameLblString);
-		userNameLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 30));
+		userNameLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 25));
 		userNameLbl.setBounds(180, 75, 166, userNameLblHeight);
 		frame.getContentPane().add(userNameLbl);
 

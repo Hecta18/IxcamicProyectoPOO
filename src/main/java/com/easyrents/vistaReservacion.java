@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,7 +16,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-public class vistaReservacion {
+public class vistaReservacion{
+
+	private static boolean updatingComboBox = false;
     public void mostrarFormularioReservacion(Vehiculo vehiculo, JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
 
         vistaInicioSesion vistaInicioSesion = new vistaInicioSesion();
@@ -47,7 +48,7 @@ public class vistaReservacion {
 		vehiculoNameLbl.setBounds(174, 35, 114, 100);
 		frame.getContentPane().add(vehiculoNameLbl);
 
-		JLabel especificacionesTLbl = new JLabel(vehiculo.getMarca() + " " + vehiculo.getModelo() + " " + String.valueOf(vehiculo.getAño()) + " " + vehiculo.getTipo());
+		JLabel especificacionesTLbl = new JLabel(vehiculo.getTipo() + " " + vehiculo.getMarca() + " " + vehiculo.getModelo() + " " + String.valueOf(vehiculo.getAño()));
 		especificacionesTLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 16));
 		especificacionesTLbl.setBounds(10, 218, 324, 34);
 		frame.getContentPane().add(especificacionesTLbl);
@@ -109,6 +110,7 @@ public class vistaReservacion {
 
 		ActionListener cambioStringPrecioIniciales = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
+				if (updatingComboBox){return;}
 				if (mesInicioBox.getSelectedItem() != null) {
 					actualizarDiasComboBox(mesInicioBox, yearInicioBox, diaInicioBox);
 					diaInicioBox.revalidate();
@@ -121,9 +123,16 @@ public class vistaReservacion {
 
 		ActionListener cambioStringPrecioFinales = new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
+				if (updatingComboBox){return;}
 				if(mesFinalBox.getSelectedItem() != null){
+					if (mesFinalBox.getSelectedItem() != null){
+						Integer deltaMonths = Integer.parseInt(String.valueOf(mesFinalBox.getSelectedItem())) - Integer.parseInt(String.valueOf(mesInicioBox.getSelectedItem()));
+						if (deltaMonths < 0){
+							mostrarError("La fecha final debe ser posterior a la fecha inicial.");
+							return;
+						}
+					}
 					actualizarDiasComboBox(mesFinalBox, yearFinalBox, diaFinalBox);
-					diaFinalBox.setEnabled(true);
 					diaFinalBox.revalidate();
 					diaFinalBox.repaint();
 					frame.getContentPane().revalidate();
@@ -134,11 +143,21 @@ public class vistaReservacion {
 
 		ActionListener cambioStringPrecioNormal = new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				if(diaInicioBox.isEnabled() && diaFinalBox.isEnabled()){
+				if (updatingComboBox){return;}
+				if(diaInicioBox.isEnabled() && diaFinalBox.isEnabled() &&
+					mesInicioBox.getSelectedItem() != null && yearInicioBox.getSelectedItem() != null &&
+					diaInicioBox.getSelectedItem() != null &&
+					mesFinalBox.getSelectedItem() != null && yearFinalBox.getSelectedItem() != null &&
+					diaFinalBox.getSelectedItem() != null) {
 					LocalDate fechaInicio = LocalDate.of(Integer.parseInt((String) yearInicioBox.getSelectedItem()), Integer.parseInt((String) mesInicioBox.getSelectedItem()), Integer.parseInt((String) diaInicioBox.getSelectedItem()));
 					LocalDate fechaFinal = LocalDate.of(Integer.parseInt((String) yearFinalBox.getSelectedItem()), Integer.parseInt((String) mesFinalBox.getSelectedItem()), Integer.parseInt((String) diaFinalBox.getSelectedItem()));
-					long numDias = Math.abs(calcDiasInBetween(fechaInicio, fechaFinal));
-					totalPagarLbl.setText("Total a pagar: Q. " + vehiculo.getTarifaDiaria() * numDias);
+					long numDias = calcDiasInBetween(fechaInicio, fechaFinal);
+					if (numDias < 0){
+						mostrarError("La fecha final debe ser posterior a la fecha inicial.");
+						totalPagarLbl.setText("Total a pagar: Q. 0.00");
+					}else{
+						totalPagarLbl.setText("Total a pagar: Q. " + vehiculo.getTarifaDiaria() * (numDias+1));
+					}
 					totalPagarLbl.revalidate();
 					totalPagarLbl.repaint();
 					frame.getContentPane().revalidate();
@@ -148,10 +167,12 @@ public class vistaReservacion {
 		};
 
 		mesInicioBox.addActionListener(cambioStringPrecioIniciales);
+		yearInicioBox.setSelectedIndex(0);
 		yearInicioBox.addActionListener(cambioStringPrecioNormal);
 		diaInicioBox.addActionListener(cambioStringPrecioNormal);
 
 		mesFinalBox.addActionListener(cambioStringPrecioFinales);
+		yearFinalBox.setSelectedIndex(0);
 		yearFinalBox.addActionListener(cambioStringPrecioNormal);
 		diaFinalBox.addActionListener(cambioStringPrecioNormal);
 
@@ -172,7 +193,7 @@ public class vistaReservacion {
 					// Date fechaInicioDate = Date.from(fechaInicio.atStartOfDay(ZoneId.systemDefault()).toInstant());
 					// Date fechaFinalDate = Date.from(fechaFinal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-					double precioPagar = vehiculo.getTarifaDiaria() * numDias;
+					double precioPagar = vehiculo.getTarifaDiaria() * (numDias+1);
 					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
 					Reserva reservaNueva = new Reserva(new Random().nextInt(999999998) + 1, vehiculo, fechaInicio, fechaFinal, precioPagar);
 					currentUsuario.getReservasAsociadas().add(reservaNueva);
@@ -232,15 +253,19 @@ public class vistaReservacion {
     }
 
 	private static void actualizarDiasComboBox(JComboBox<String> mesBox, JComboBox<String> yearBox, JComboBox<String> diaBox) {
-        diaBox.removeAllItems();
+		updatingComboBox = true;
+
+        diaBox.setEnabled(true);
+		diaBox.removeAllItems();
         int mesSeleccionado = mesBox.getSelectedIndex() + 1;
-        int yearSeleccionado = Integer.parseInt((String) yearBox.getSelectedItem());
+        int yearSeleccionado = Integer.parseInt(String.valueOf(yearBox.getSelectedItem()));
 
         int diasEnMes = LocalDate.of(yearSeleccionado, mesSeleccionado, 1).lengthOfMonth();
         for (int i = 1; i <= diasEnMes; i++) {
             diaBox.addItem(String.valueOf(i));
         }
-        diaBox.setEnabled(true);
+
+		updatingComboBox = false;
     }
 
 	public long calcDiasInBetween(LocalDate fechaInicio, LocalDate fechaFinal) {
