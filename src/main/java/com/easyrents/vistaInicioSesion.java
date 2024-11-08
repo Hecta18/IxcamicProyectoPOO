@@ -703,9 +703,10 @@ public class vistaInicioSesion {
 			reservasArray[i] = currentUsuario.getReservasAsociadas().get(i).toString();
 		}
 
-		JList<String> listReservas = new JList<String>(reservasArray);
+		JList<String> listReservas = new JList<String>();
 		listReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listReservas.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 10));
+		listReservas.setListData(reservasArray);
 
 		JScrollPane reservasPane = new JScrollPane(listReservas);
 		reservasPane.setBounds(10, 86, 324, 357);
@@ -720,6 +721,10 @@ public class vistaInicioSesion {
 		eliminarRsrvBtn.setBackground(Color.WHITE);
 		eliminarRsrvBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
+				if (listReservas.getSelectedValue() == null){
+					mostrarError("Debe de seleccionar una reserva.");
+					return;
+				}
 				String seleccionada = listReservas.getSelectedValue().toString();
 				String[] seleccionadaArray = seleccionada.split(",");
 				int id = Integer.parseInt(seleccionadaArray[0]);
@@ -737,7 +742,7 @@ public class vistaInicioSesion {
 						break;
 					}
 				}
-				userControl.actualizarReservasUsuario(currentUsuario.getID(), currentUsuario.getReservasAsociadas());
+				userControl.actualizarReservasUsuario(currentUsuario.getID(), currentUsuario.getReservasAsociadas(), userList);
 				String[] reservasArray = new String[currentUsuario.getReservasAsociadas().size()];
 				for(int i = 0; i < currentUsuario.getReservasAsociadas().size(); i++){
 					reservasArray[i] = currentUsuario.getReservasAsociadas().get(i).toString();

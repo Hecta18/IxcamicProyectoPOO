@@ -194,15 +194,17 @@ public class vistaReservacion{
 					// Date fechaFinalDate = Date.from(fechaFinal.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 					double precioPagar = vehiculo.getTarifaDiaria() * (numDias+1);
-					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
+					
 					Reserva reservaNueva = new Reserva(new Random().nextInt(999999998) + 1, vehiculo, fechaInicio, fechaFinal, precioPagar);
-					currentUsuario.getReservasAsociadas().add(reservaNueva);
 					for (Usuario u : userList){
 						if(u.getID() == currentUsuario.getID()){
-							u.setReservasAsociadas(currentUsuario.getReservasAsociadas());
+							u.getReservasAsociadas().add(reservaNueva);
+							userControl.actualizarReservasUsuario(u.getID(), currentUsuario.getReservasAsociadas(), userList);
 						}
 					}
-					userControl.actualizarReservasUsuario(currentUsuario.getID(), currentUsuario.getReservasAsociadas());
+					
+
+					mostrarConfirmacion("¡Se ha creado la reserva exitosamente!");
 				}catch(NumberFormatException nF){
 					mostrarError("Debe de llenar todos los campos de fecha solicitados.");
 				}

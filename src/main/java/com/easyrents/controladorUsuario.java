@@ -13,7 +13,6 @@ import javax.swing.JOptionPane;
 
 public class controladorUsuario {
     private vistaInicioSesion vistaInicioSesion; // Vista para el inicio de sesión
-    private ArrayList<Usuario> listaUsuarios; // Lista de usuarios cargada desde el archivo CSV
     
         // Método para cargar usuarios desde un archivo CSV
         // Los usuarios se guardarán de la siguiente forma:
@@ -42,13 +41,23 @@ public class controladorUsuario {
                             usuarios.add(usuario);
                         }else{
                             String[] reservasStrings = reservasArray.split("},\\{");
-                        
+                            for(String s : reservasStrings){
+                                System.out.println(s);
+                            }
                             for (String reservaStr : reservasStrings) {
-                                String[] reservaData = reservaStr.split(",", 6);
-                                int reservaID = Integer.parseInt(reservaData[0]);
+                                String[] reservaData = reservaStr.split(";", 6);
+                                System.out.println("-----");
+                                for (String s : reservaData){
+                                    System.out.println(s);
+                                }
+                                int reservaID = Integer.parseInt(reservaData[0].replaceFirst("\\{", ""));
                                 
                                 // Datos del vehículo
                                 String[] vehiculoData = reservaData[1].substring(1, reservaData[1].length() - 1).split(",");
+                                System.out.println("-----");
+                                for (String s : vehiculoData){
+                                    System.out.println(s);
+                                }
                                 int vehiculoID = Integer.parseInt(vehiculoData[0]);
                                 String marca = vehiculoData[1];
                                 String modelo = vehiculoData[2];
@@ -89,7 +98,7 @@ public class controladorUsuario {
                 .map(reserva -> {
                     Vehiculo vehiculo = reserva.getVehiculo();
                     // Cambiar de una vez a los tipos de datos que se necesiten:
-                    return String.format("{%d,{%d,%s,%s,%d,%s,%.2f,%b},%s,%s,%.2f,%s}",
+                    return String.format("{%d;{%d,%s,%s,%d,%s,%.2f,%b};%s;%s;%.2f;%s}",
                         reserva.getId(),
                         vehiculo.getID(),
                         vehiculo.getMarca(),
@@ -124,21 +133,24 @@ public class controladorUsuario {
                 throw new RuntimeException("Error al guardar el usuario en el archivo CSV: " + e.getMessage());
             }
         }
-        // Método para gestionar el inicio de sesión de un usuario
-        public void iniciarSesion(String correo, String contraseña) {
-            if (correo == null || contraseña == null || correo.isEmpty() || contraseña.isEmpty()) {
-                vistaInicioSesion.mostrarError("El correo y la contraseña son obligatorios.");
-                return;
+    
+    /* ESTOS MÉTODOS NO SE ESTÁN USANDO
+    // Método para gestionar el inicio de sesión de un usuario
+    public void iniciarSesion(String correo, String contraseña) {
+        if (correo == null || contraseña == null || correo.isEmpty() || contraseña.isEmpty()) {
+            vistaInicioSesion.mostrarError("El correo y la contraseña son obligatorios.");
+            return;
+        }
+        // Nombre del archivo default: usuarios.csv
+        ArrayList<Usuario> listaUsuarios = cargarUsuariosDesdeCSV();
+        for (Usuario u : listaUsuarios){
+            if(u.getCorreo().equals(correo) && contraseña.equals(u.getContraseña())){
+                // FALTA
             }
-            // Nombre del archivo default: usuarios.csv
-            ArrayList<Usuario> listaUsuarios = cargarUsuariosDesdeCSV();
-            for (Usuario u : listaUsuarios){
-                if(u.getCorreo().equals(correo) && contraseña.equals(u.getContraseña())){
-                    // FALTA
-                }
-            }
+        }
     }
 
+    
     // Método para registrar un nuevo usuario en el sistema
     public void registrarUsuario(Usuario nuevoUsuario) {
         if (nuevoUsuario == null || nuevoUsuario.getCorreo().isEmpty() || nuevoUsuario.getContraseña().isEmpty()) {
@@ -165,9 +177,10 @@ public class controladorUsuario {
         }
         return null;
     }
+    */
 
     //metodo para actualizar la reserva de un usuario 
-    public void actualizarReservasUsuario(int userID,  ArrayList<Reserva> nuevasReservas){
+    public void actualizarReservasUsuario(int userID,  ArrayList<Reserva> nuevasReservas, ArrayList<Usuario> listaUsuarios){
         //buscar el usuario dentro de la lista
         Usuario usuario = null;
         for (Usuario u : listaUsuarios) {
@@ -198,7 +211,7 @@ public class controladorUsuario {
                 String reservasString = usuario.getReservasAsociadas().stream()
                     .map(reserva -> {
                         Vehiculo vehiculo = reserva.getVehiculo();
-                        return String.format("{%d,{%d,%s,%s,%d,%s,%.2f,%b},%s,%s,%.2f,%s}",
+                        return String.format("{%d;{%d,%s,%s,%d,%s,%.2f,%b};%s;%s;%.2f;%s}",
                             reserva.getId(),
                             vehiculo.getID(),
                             vehiculo.getMarca(),
