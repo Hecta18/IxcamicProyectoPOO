@@ -41,23 +41,12 @@ public class controladorUsuario {
                             usuarios.add(usuario);
                         }else{
                             String[] reservasStrings = reservasArray.split("},\\{");
-                            for(String s : reservasStrings){
-                                System.out.println(s);
-                            }
                             for (String reservaStr : reservasStrings) {
                                 String[] reservaData = reservaStr.split(";", 6);
-                                System.out.println("-----");
-                                for (String s : reservaData){
-                                    System.out.println(s);
-                                }
                                 int reservaID = Integer.parseInt(reservaData[0].replaceFirst("\\{", ""));
                                 
                                 // Datos del vehículo
                                 String[] vehiculoData = reservaData[1].substring(1, reservaData[1].length() - 1).split(",");
-                                System.out.println("-----");
-                                for (String s : vehiculoData){
-                                    System.out.println(s);
-                                }
                                 int vehiculoID = Integer.parseInt(vehiculoData[0]);
                                 String marca = vehiculoData[1];
                                 String modelo = vehiculoData[2];
