@@ -186,7 +186,7 @@ public class controladorUsuario {
             // Guardar la lista completa de usuarios en el archivo CSV
             guardarListaUsuariosEnCSV(listaUsuarios);
             
-            JOptionPane.showMessageDialog(null, "Reservas actualizadas exitosamente para el usuario con ID " + userID);
+            JOptionPane.showMessageDialog(null, "Reservas actualizadas exitosamente!" + userID);
         } else {
             JOptionPane.showMessageDialog(null, "Usuario con ID " + userID + " no encontrado.");
         }

@@ -1,6 +1,7 @@
 package main.java.com.easyrents;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class Reserva {
@@ -39,7 +40,7 @@ public class Reserva {
     public void setEstado(String estado) {this.estado = estado;}
     //validar fecha final despues de inicial
     public void setFechaFin(LocalDate fechaFin) {
-        if (fechaFin.isAfter(fechaInicio)) {
+        if (ChronoUnit.DAYS.between(fechaInicio, fechaFin) >= 0) {
             this.fechaFin = fechaFin;
         } else {
             throw new IllegalArgumentException("La fecha final debe ser posterior a la fecha de inicio");
@@ -78,7 +79,7 @@ public class Reserva {
     //TOSTRING
     @Override
     public String toString() {
-        return this.getId() + "," + vehiculo.getID() + "," + vehiculo.getMarca() + "," + vehiculo.getModelo() + "," + vehiculo.getAño() + "," + fechaInicio + "," + fechaFin + "," + monto;
+        return vehiculo.getMarca() + " " + vehiculo.getModelo() + " " + vehiculo.getAño() + " (" + fechaInicio + " a " + fechaFin + ")" + " Q." + monto;
     }
 
 	public char[] toCSV() {

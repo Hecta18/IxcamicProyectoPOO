@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -23,9 +22,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.plaf.basic.BasicScrollBarUI;
+
 
 public class vistaInicioSesion {
-
     public void mostrarFormulario(JFrame frame, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
 		//preparar pantalla
         frame.getContentPane().removeAll();
@@ -272,8 +272,8 @@ public class vistaInicioSesion {
 
         JButton backBtn = new JButton("Regresar");
 		backBtn.setBackground(Color.WHITE);
-		backBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 13));
-		backBtn.setBounds(264, 556, 80, 45);
+		backBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 12));
+		backBtn.setBounds(260, 556, 80, 45);
         backBtn.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e){
@@ -409,17 +409,19 @@ public class vistaInicioSesion {
 				if(tipoUsuarioDropDown.getSelectedItem().toString().equals("Otro (Especifique)")){
 					razonExtra.setVisible(true);
 					razonExtraLbl.setVisible(true);
+					crearCuentaBtn.setBounds(98,521, 155,54);
 				}else{
 					razonExtra.setVisible(false);
 					razonExtraLbl.setVisible(false);
+					crearCuentaBtn.setBounds(98, 479, 155, 54);
 				}
 			}
 		});
 		frame.getContentPane().add(tipoUsuarioDropDown);
 
-		crearCuentaBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 22));
+		crearCuentaBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 20));
         crearCuentaBtn.setBackground(Color.WHITE);
-		crearCuentaBtn.setBounds(98, 521, 155, 54);
+		crearCuentaBtn.setBounds(98, 479, 155, 54);
 		int randomID = new Random().nextInt(999999998) + 1;
         crearCuentaBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
@@ -508,10 +510,6 @@ public class vistaInicioSesion {
 
     public void redireccionarDashboard(JFrame frame, Usuario currentUsuario, ArrayList<Usuario> userList, ArrayList<Vehiculo> vehicleList, controladorUsuario userControl, controladorVehiculo vehicleControl) {
 		drawMainButtons(frame, currentUsuario, userList, vehicleList, userControl, vehicleControl);
-		
-		for (Reserva r : currentUsuario.getReservasAsociadas()) {
-			System.out.println(r.toString());
-		}
 
 		JLabel dashboardTitleLbl = new JLabel("Página Principal");
 		dashboardTitleLbl.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 23));
@@ -531,12 +529,27 @@ public class vistaInicioSesion {
 		tipoVehiculoDropDown.setSelectedItem(null);
 
 		JList<String> vehiculoDropDown = new JList<String>();
-		vehiculoDropDown.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 16));
+		vehiculoDropDown.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 20));
 		vehiculoDropDown.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 
 		JScrollPane resultsScrollPane = new JScrollPane(vehiculoDropDown);
 		resultsScrollPane.setViewportBorder(null);
 		resultsScrollPane.setBounds(10, 180, 324, 262);
+		resultsScrollPane.getVerticalScrollBar().setBackground(Color.WHITE);
+		resultsScrollPane.getHorizontalScrollBar().setBackground(Color.WHITE);
+		resultsScrollPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+			@Override
+			protected void configureScrollBarColors() {
+				this.thumbColor = Color.LIGHT_GRAY;
+			}
+		});
+		resultsScrollPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
+			@Override
+			protected void configureScrollBarColors() {
+				this.thumbColor = Color.LIGHT_GRAY;
+			}
+		});
 		frame.getContentPane().add(resultsScrollPane);
 
         tipoVehiculoDropDown.addActionListener(e -> {
@@ -699,45 +712,54 @@ public class vistaInicioSesion {
 		frame.getContentPane().add(reservasTitleLbl);
 
 		String[] reservasArray = new String[currentUsuario.getReservasAsociadas().size()];
-		for(int i = 0; i < currentUsuario.getReservasAsociadas().size(); i++){
+		for (int i = 0; i < currentUsuario.getReservasAsociadas().size(); i++) {
 			reservasArray[i] = currentUsuario.getReservasAsociadas().get(i).toString();
 		}
 
-		JList<String> listReservas = new JList<String>();
+		JList<String> listReservas = new JList();
+		listReservas.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 18));
 		listReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		listReservas.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 10));
 		listReservas.setListData(reservasArray);
+		listReservas.revalidate();
+		frame.getContentPane().revalidate();
 
-		JScrollPane reservasPane = new JScrollPane(listReservas);
+		JScrollPane reservasPane = new JScrollPane();
+		reservasPane.setViewportView(listReservas);
 		reservasPane.setBounds(10, 86, 324, 357);
 		reservasPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		reservasPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		reservasPane.setBackground(Color.WHITE);
+		reservasPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		// Estas dos cambian el fondo de la scrollbar
+		reservasPane.getVerticalScrollBar().setBackground(Color.WHITE);
+		reservasPane.getHorizontalScrollBar().setBackground(Color.WHITE);
+
+		// PARA CAMBIAR EL COLOR DE LA SCROLLBAR EN SÍ
+		reservasPane.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+			@Override
+			protected void configureScrollBarColors() {
+				this.thumbColor = Color.LIGHT_GRAY;
+			}
+		});
+		reservasPane.getHorizontalScrollBar().setUI(new BasicScrollBarUI() {
+			@Override
+			protected void configureScrollBarColors() {
+				this.thumbColor = Color.LIGHT_GRAY;
+			}
+		});
 		frame.getContentPane().add(reservasPane);
+		frame.repaint();
 		
-		JButton eliminarRsrvBtn = new JButton("Eliminar");
+		JButton eliminarRsrvBtn = new JButton("Eliminar Reserva");
 		eliminarRsrvBtn.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 18));
-		eliminarRsrvBtn.setBounds(115, 470, 117, 38);
+		eliminarRsrvBtn.setBounds(85, 470, 175, 40);
 		eliminarRsrvBtn.setBackground(Color.WHITE);
 		eliminarRsrvBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent a) {
 				if (listReservas.getSelectedValue() == null){
-					mostrarError("Debe de seleccionar una reserva.");
+					mostrarError("Debe de seleccionar una reserva para eliminarla.");
 					return;
 				}
-				String seleccionada = listReservas.getSelectedValue().toString();
-				String[] seleccionadaArray = seleccionada.split(",");
-				int id = Integer.parseInt(seleccionadaArray[0]);
-				int vehiculoID = Integer.parseInt(seleccionadaArray[1]);
-				String marca = seleccionadaArray[2];
-				String modelo = seleccionadaArray[3];
-				int año = Integer.parseInt(seleccionadaArray[4]);
-				LocalDate fechaInicio = LocalDate.parse(seleccionadaArray[5]);
-				LocalDate fechaFin = LocalDate.parse(seleccionadaArray[6]);
-				double monto = Double.parseDouble(seleccionadaArray[7]);
-				Reserva reserva = new Reserva(id, new Vehiculo(vehiculoID, marca, modelo, año, null, 0, false), fechaInicio, fechaFin, monto);
 				for(Reserva r : currentUsuario.getReservasAsociadas()){
-					if(r.getId() == id){
+					if(r.toString().equals(listReservas.getSelectedValue())){
 						currentUsuario.getReservasAsociadas().remove(r);
 						break;
 					}
