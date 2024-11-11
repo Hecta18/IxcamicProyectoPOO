@@ -10,31 +10,31 @@
         <relativePath>../pom.xml</relativePath> <!-- Ruta al POM principal -->
     </parent>
 
-    <artifactId>proyecto-maven</artifactId>
-
-    <dependencies>
-        <!-- Aquí van las dependencias específicas del módulo -->
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.7.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.itextpdf</groupId>
-            <artifactId>itext7-core</artifactId>
-            <version>7.2.0</version>
-            <type>pom</type>
-        </dependency>
-    </dependencies>
+    <artifactId>proyecto-ant</artifactId>
 
     <build>
         <plugins>
-            <!-- Puedes agregar otros plugins específicos del módulo aquí -->
+            <!-- Configuración del plugin de Ant -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>none</phase> <!-- Controlado manualmente -->
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <ant antfile="build.xml"> <!-- Ruta a tu archivo build.xml de Ant -->
+                                    <!-- Configuración adicional si es necesario -->
+                                </ant>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
